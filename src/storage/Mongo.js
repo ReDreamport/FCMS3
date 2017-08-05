@@ -118,15 +118,16 @@ exports.toMongoCriteria = function (criteria) {
     let __type = criteria.__type
     delete criteria.__type
 
+    let mongoCriteria = {}
+
     switch (__type) {
-        case 'mongo':
-            return criteria
-        case  'relation':
-            let mongoCriteria = {}
-            toMongoCriteria(criteria, mongoCriteria)
-            return mongoCriteria
-        default:
-            return criteria
+    case 'mongo':
+        return criteria
+    case 'relation':
+        toMongoCriteria(criteria, mongoCriteria)
+        return mongoCriteria
+    default:
+        return criteria
     }
 }
 
@@ -150,38 +151,38 @@ function toMongoCriteria(criteria, mongoCriteria) {
         let field = criteria.field
         let fc = mongoCriteria[field] = mongoCriteria[field] || {}
         switch (operator) {
-            case '==':
-                mongoCriteria[field] = value
-                break
-            case '!=':
-                fc.$ne = value // TODO 对于部分运算符要检查 comparedValue 不为 null/undefined/NaN
-                break
-            case '>':
-                fc.$gt = value
-                break
-            case '>=':
-                fc.$gte = value
-                break
-            case '<':
-                fc.$lt = value
-                break
-            case '<=':
-                fc.$lte = value
-                break
-            case 'in':
-                fc.$in = value
-                break
-            case 'nin':
-                fc.$nin = value
-                break
-            case 'start':
-                fc.$regex = "^" + value
-                break
-            case 'end':
-                fc.$regex = value + "$"
-                break
-            case 'contain':
-                fc.$regex = value
+        case '==':
+            mongoCriteria[field] = value
+            break
+        case '!=':
+            fc.$ne = value // TODO 对于部分运算符要检查 comparedValue 不为 null/undefined/NaN
+            break
+        case '>':
+            fc.$gt = value
+            break
+        case '>=':
+            fc.$gte = value
+            break
+        case '<':
+            fc.$lt = value
+            break
+        case '<=':
+            fc.$lte = value
+            break
+        case 'in':
+            fc.$in = value
+            break
+        case 'nin':
+            fc.$nin = value
+            break
+        case 'start':
+            fc.$regex = "^" + value
+            break
+        case 'end':
+            fc.$regex = value + "$"
+            break
+        case 'contain':
+            fc.$regex = value
         }
     }
 }

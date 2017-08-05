@@ -10,7 +10,7 @@ exports.use = function (f) {
         if (cluster.isMaster) {
             console.log(`Master ${process.pid} is running`)
 
-            cluster.on('exit', (worker, code, signal) => {
+            cluster.on('exit', (worker) => {
                 console.log(`worker ${worker.process.pid} died`)
             })
 

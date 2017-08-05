@@ -167,7 +167,7 @@ exports.parseFieldValue = function (value, fieldMeta) {
             return Util.stringToInt(value)
     else if (fieldMeta.type === "Float")
         if (_.isArray(value))
-            return _map(value, (i) => Util.stringToFloat(i))
+            return _.map(value, (i) => Util.stringToFloat(i))
         else
             return Util.stringToFloat(value)
     else if (fieldMeta.type === "Component") {

@@ -1,4 +1,5 @@
 const chance = new require('chance')()
+const _ = require('lodash')
 
 const Error = require('../Error')
 const Log = require('../Log')

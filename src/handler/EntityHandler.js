@@ -1,14 +1,12 @@
 const _ = require('lodash')
 
-const Log = require('../Log')
+// const Log = require('../Log')
 const Error = require('../Error')
 const Meta = require('../Meta')
 const Util = require('../Util')
 
 const EntityService = require('../service/EntityService')
 const Interceptor = require('./EntityInterceptor')
-
-const Mysql = require('../storage/Mysql')
 
 const Cache = require('../cache/Cache')
 
@@ -270,9 +268,9 @@ exports.parseListQuery = function (entityMeta, query) {
         }
     }
 
-// Log.debug('criteria', criteria)
+    // Log.debug('criteria', criteria)
 
-// 整理排序所用字段
+    // 整理排序所用字段
     if (query._sort) {
         try {
             sort = JSON.parse(query._sort)

@@ -2,7 +2,7 @@ const Error = require('../error')
 const Config = require('../Config')
 
 const UserService = require('../security/UserService')
-const SecurityCodeService = require('../security/SecurityCodeService')
+// const SecurityCodeService = require('../security/SecurityCodeService')
 
 function checkPasswordFormat(password, format) {
     return format.test(password)

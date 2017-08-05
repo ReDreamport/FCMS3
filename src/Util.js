@@ -6,8 +6,6 @@ const ObjectId = require('mongodb').ObjectId
 const xmlBuilder = new xml2js.Builder({rootName: 'xml', headless: true})
 const parseXMLString = Promise.promisify(xml2js.parseString.bind(xml2js))
 
-const Log = require('./Log')
-
 exports.objectToKeyValuePairString = function (obj) {
     "use strict"
     let a = _.map(obj, (k, v) => `${k}=${v}`)
@@ -163,7 +161,7 @@ exports.jsObjectToTypedJSON = function (jsObject) {
         return jsonArray
     } else if (_.isObject(jsObject)) {
         let jsonObject = {}
-        _.map(jsObject, (k, v) => jsonObject[k] = addType(b))
+        _.map(jsObject, (k, v) => jsonObject[k] = addType(v))
         return jsonObject
     } else {
         return jsObject
@@ -175,14 +173,14 @@ exports.typedJSONToJsObject = function (jsonObject) {
 
     function removeType(value) {
         switch (value._type) {
-            case 'Date' :
-                return new Date(value._value)
-            case 'ObjectId' :
-                return new ObjectId(value._value)
-            case 'json' :
-                return exports.typedJSONToJsObject(value._value)
-            default:
-                return value._value
+        case 'Date' :
+            return new Date(value._value)
+        case 'ObjectId' :
+            return new ObjectId(value._value)
+        case 'json' :
+            return exports.typedJSONToJsObject(value._value)
+        default:
+            return value._value
         }
     }
 

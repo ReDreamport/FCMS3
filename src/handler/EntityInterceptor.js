@@ -19,7 +19,7 @@ exports.setInterceptor = function (entityName, actions, asyncInterceptor) {
 
     asyncInterceptors[entityName] = asyncInterceptors[entityName] || {}
     for (let action of actions)
-        asyncInterceptors[entityName][action] = gInterceptor
+        asyncInterceptors[entityName][action] = asyncInterceptor
 }
 
 exports.getInterceptor = function (entityName, action) {

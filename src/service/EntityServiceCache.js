@@ -1,5 +1,5 @@
 const _ = require('lodash')
-const sizeof = require('object-sizeof')
+// const sizeof = require('object-sizeof')
 
 const Log = require('../Log')
 const Cache = require('../cache/Cache')

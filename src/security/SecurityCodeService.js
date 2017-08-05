@@ -1,7 +1,7 @@
 const chance = new require('chance')()
-const Promise = require('bluebird')
-const request = require('request')
-const pRequestPost = Promise.promisify(request.post.bind(request))
+// const Promise = require('bluebird')
+// const request = require('request')
+// const pRequestPost = Promise.promisify(request.post.bind(request))
 
 const Error = require('../Error')
 const Cache = require('../cache/Cache')

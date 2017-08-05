@@ -16,8 +16,8 @@ function prepareSender() {
     if (pSendMail) return pSendMail
 
     let transporter = nodemailer.createTransport({
-        host: config.mail.host, port: config.mail.port,
-        auth: {user: config.mail.user, pass: config.mail.password}
+        host: Config.mail.host, port: Config.mail.port,
+        auth: {user: Config.mail.user, pass: Config.mail.password}
     })
     pSendMail = Promise.promisify(transporter.sendMail.bind(transporter))
     return pSendMail

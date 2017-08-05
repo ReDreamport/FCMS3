@@ -32,7 +32,7 @@ exports.aGetObject = async function (keysArray, alternative) {
 }
 
 exports.aSetObject = async function (keysArray, value) {
-    let value = Util.jsObjectToTypedJSON(value)
+    value = Util.jsObjectToTypedJSON(value)
     let str = value && JSON.stringify(value)
     await aSet(keysArray, str)
 }
@@ -64,14 +64,14 @@ exports.aClearAllCache = async function () {
     if (keys.length) await Redis.client.delAsync(keys)
 }
 
-(async function () {
-    Log.config({})
-    Redis.init()
-
-    await exports.aSetObject(['aaa'], {a: 1, time: new Date(), aaa: [4, 5]})
-
-    let v = await exports.aGetObject(['aaa'])
-    console.log(v)
-    await exports.aUnset(["a"], [1, 2, 3, 4])
-
-})().catch((e) => Log.system.error(e, 'test'))
+// (async function () {
+//     Log.config({})
+//     Redis.init()
+//
+//     await exports.aSetObject(['aaa'], {a: 1, time: new Date(), aaa: [4, 5]})
+//
+//     let v = await exports.aGetObject(['aaa'])
+//     console.log(v)
+//     await exports.aUnset(["a"], [1, 2, 3, 4])
+//
+// })().catch((e) => Log.system.error(e, 'test'))
