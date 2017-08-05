@@ -1,6 +1,7 @@
 const _ = require('lodash')
 
 const Meta = require('./Meta')
+const Config = require('./Config')
 
 function patchSystemFields(entityMeta) {
     let fields = {}
@@ -75,7 +76,7 @@ const SystemEntities = {
                 ]
             },
             dbName: {
-                ame: 'dbName', label: '数据库名', type: 'String', inputType: "Select"
+                name: 'dbName', label: '数据库名', type: 'String', inputType: "Select"
             },
             tableName: {
                 name: 'tableName', label: '表名', type: 'String', inputType: "Text"
@@ -444,11 +445,18 @@ const SystemEntities = {
     }
 }
 
-for (let entityName in SystemEntities) {
-    let entityMeta = SystemEntities[entityName]
-    if (!entityMeta.noPatchSystemFields) patchSystemFields(entityMeta)
-    delete entityMeta.idType
-    entityMeta.system = true
-}
+exports.init = function () {
+    for (let entityName in SystemEntities) {
+        let entityMeta = SystemEntities[entityName]
+        if (!entityMeta.noPatchSystemFields) patchSystemFields(entityMeta)
+        delete entityMeta.idType
+        entityMeta.system = true
+    }
 
-exports.SystemEntities = SystemEntities
+    let databases = _.map(Config.mongoDatabases, (d) => d.name)
+    SystemEntities.F_EntityMeta.fields.dbName.options = arrayToOption(databases)
+
+    // TODO mysql databases
+
+    exports.SystemEntities = SystemEntities
+}

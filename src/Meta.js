@@ -61,6 +61,7 @@ exports.getMetaForFront = () => {
 
 exports.aLoad = async function () {
     const SystemMeta = require('./SystemMeta')
+    SystemMeta.init()
 
     let db = await Mongo.stores.main.aDatabase()
 
@@ -225,7 +226,7 @@ exports.formatFieldToHttp = function (fieldValue, fieldMeta) {
             throw new Error `No ref entity [${fieldMeta.refEntity}]. Field ${fieldMeta.name}`
 
         if (fieldMeta.multiple)
-            _.map(fieldValue, (i) => exports.formatEntityToHttp(i, refEntityMeta))
+            return _.map(fieldValue, (i) => exports.formatEntityToHttp(i, refEntityMeta))
         else
             return exports.formatEntityToHttp(fieldValue, refEntityMeta)
     } else if (fieldMeta.type === "Reference")
