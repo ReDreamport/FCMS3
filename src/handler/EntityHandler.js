@@ -26,10 +26,13 @@ exports.aCreateEntity = async function (ctx) {
     exports.removeNoCreateFields(entityMeta, ctx.state.user, instance)
 
     let fieldCount = 0
-    _.each(instance, (value, key) => _.isNull(value) ? delete instance[key] : fieldCount++)
+    for (let key in instance) {
+        let value = instance[key]
+        _.isNull(value) ? delete instance[key] : fieldCount++
+    }
     if (!fieldCount) throw new Error.UserError("EmptyOperation")
 
-    operator = ctx.state.user
+    let operator = ctx.state.user
     instance._createdBy = operator && operator._id
 
     let aIntercept = Interceptor.getInterceptor(entityName, Interceptor.Actions.Create)
@@ -218,10 +221,6 @@ exports.parseListQuery = function (entityMeta, query) {
     if (!query) return {}
     let criteria, sort, includedFields = Util.splitString(query._includedFields, ",")
 
-    let pageNo = Util.stringToInt(query._pageNo, 1)
-    let pageSize = Util.stringToInt(query._pageSize, (digest && -1 || 20))
-    if (pageSize > 200) pageSize = 200  // TODO 控制量
-
     let digest = query._digest === 'true'
     if (digest)
         if (entityMeta.digestFields) { // "username|email,admin"
@@ -233,16 +232,20 @@ exports.parseListQuery = function (entityMeta, query) {
             includedFields = ["_id"]
         }
 
+    let pageNo = Util.stringToInt(query._pageNo, 1)
+    let pageSize = Util.stringToInt(query._pageSize, (digest && -1 || 20))
+    if (pageSize > 200) pageSize = 200  // TODO 控制量
+
     // 整理筛选查询条件
     let fastFilter = query._filter
     if (fastFilter) {
         let orList = []
         orList.push({field: "_id", operator: "==", value: fastFilter})
 
-        _.each(entityMeta.fields, (fieldMeta, fieldName) => {
+        for (let fieldName in entityMeta.fields) {
+            let fieldMeta = entityMeta.fields[fieldName]
             if (fieldMeta.asFastFilter) orList.push({field: fieldName, operator: "contain", value: fastFilter})
-        })
-
+        }
         criteria = {__type: 'relation', relation: "or", items: orList}
     } else {
         if (query._criteria) {
@@ -253,9 +256,10 @@ exports.parseListQuery = function (entityMeta, query) {
             }
         } else {
             let criteriaList = []
-            _.each(query, (value, key) => {
+            for (let key in query) {
+                let value = query[key]
                 if (entityMeta.fields[key]) criteriaList.push({field: key, operator: "==", value: value})
-            })
+            }
 
             criteria = criteriaList.length ? {__type: 'relation', relation: 'and', items: criteriaList} : null
         }
@@ -266,9 +270,9 @@ exports.parseListQuery = function (entityMeta, query) {
         }
     }
 
-    // Log.debug('criteria', criteria)
+// Log.debug('criteria', criteria)
 
-    // 整理排序所用字段
+// 整理排序所用字段
     if (query._sort) {
         try {
             sort = JSON.parse(query._sort)
@@ -320,14 +324,14 @@ exports.removeNotShownFields = function (entityMeta, user, ...entities) {
     let fields = entityMeta.fields
 
     let removedFieldNames = []
-    _.each(fields, (fieldMeta, fieldName) => {
-        "use strict"
+    for (let fieldName in fields) {
+        let fieldMeta = fields[fieldName]
         if (fieldMeta.type === 'Password')
             removedFieldNames.push(fieldName)
         else if (fieldMeta.notShow && !Util.isUserOrRoleHasFieldAction(user, entityMeta.name, fieldName, 'show')) {
             removedFieldNames.push(fieldName)
         }
-    })
+    }
 
     if (!removedFieldNames.length) return
 
@@ -344,12 +348,12 @@ exports.removeNoCreateFields = function (entityMeta, user, entity) {
     let fields = entityMeta.fields
 
     let removedFieldNames = []
-    _.each(fields, (fieldMeta, fieldName) => {
-        "use strict"
+    for (let fieldName in fields) {
+        let fieldMeta = fields[fieldName]
         if (fieldMeta.noCreate && !Util.isUserOrRoleHasFieldAction(user, entityMeta.name, fieldName, 'create')) {
             removedFieldNames.push(fieldName)
         }
-    })
+    }
 
     if (!removedFieldNames.length) return
 
@@ -363,13 +367,13 @@ exports.removeNoEditFields = function (entityMeta, user, entity) {
     let fields = entityMeta.fields
 
     let removedFieldNames = []
-    _.each(fields, (fieldMeta, fieldName) => {
-        "use strict"
+    for (let fieldName in fields) {
+        let fieldMeta = fields[fieldName]
         if ((fieldMeta.noEdit || fieldMeta.editReadonly)
             && !Util.isUserOrRoleHasFieldAction(user, entityMeta.name, fieldName, 'edit')) {
             removedFieldNames.push(fieldName)
         }
-    })
+    }
 
     if (!removedFieldNames.length) return
 

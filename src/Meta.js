@@ -1,7 +1,6 @@
 const _ = require('lodash')
 const crypto = require('crypto')
 const ObjectId = require('mongodb').ObjectId
-const path = require('path')
 
 const Util = require('./Util')
 const Log = require('./Log')
@@ -110,12 +109,12 @@ exports.parseEntity = function (entityInput, entityMeta) {
     if (!_.isObject(entityInput)) return undefined
     let entityValue = {}
     let fields = entityMeta.fields
-    _.each(fields, (fMeta, fName) => {
-        "use strict"
+    for (let fName in fields) {
+        let fMeta = fields[fName]
         let fv = exports.parseFieldValue(entityInput[fName], fMeta)
         // undefined / NaN 去掉，null 保留！
         if (!(_.isUndefined(fv) || _.isNaN(fv))) entityValue[fName] = fv
-    })
+    }
 
     return entityValue
 }
@@ -242,10 +241,11 @@ exports.formatEntityToHttp = function (entityValue, entityMeta) {
 
     let output = {}
 
-    _.each(entityMeta.fields, (fieldMeta, fName) => {
+    for (let fName in entityMeta.fields) {
+        let fieldMeta = entityMeta.fields[fName]
         let o = exports.formatFieldToHttp(entityValue[fName], fieldMeta)
         if (!_.isUndefined(o)) output[fName] = o
-    })
+    }
 
     return output
 }

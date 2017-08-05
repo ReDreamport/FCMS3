@@ -166,7 +166,7 @@ function match(method, path, params) {
             } else {
                 let newPossibleRouteUrl = collectRouteUrls(mOfIndex, part)
                 // 取交集
-                _.each(possibleRouteUrl, (v, u) => newPossibleRouteUrl[u] && delete possibleRouteUrl[u])
+                for (let u in possibleRouteUrl) !newPossibleRouteUrl[u] && delete possibleRouteUrl[u]
             }
             if (!_.size(possibleRouteUrl)) return null
         }
@@ -174,16 +174,18 @@ function match(method, path, params) {
         // 如果有多个匹配，变量出现位置靠后的胜出（没有变量的最胜）
         let maxRouteWeight = 0
         let finalRoute = null
-        _.each(possibleRouteUrl, (value, routeUrl) => {
-            "use strict"
+        for (let routeUrl in possibleRouteUrl) {
             let route = routes[method + routeUrl]
             if (route.routeWeight > maxRouteWeight) {
                 finalRoute = route
                 maxRouteWeight = route.routeWeight
             }
-        })
+        }
 
-        _.each(finalRoute.indexToVariable, (index, name) => params[name] = parts[index])
+        for (let name in finalRoute.indexToVariable) {
+            let index = finalRoute.indexToVariable[name]
+            params[name] = parts[index]
+        }
         return finalRoute
     }
 }

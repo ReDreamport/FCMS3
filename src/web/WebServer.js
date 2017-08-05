@@ -16,7 +16,7 @@ exports.aStart = async function () {
 
     // pug
     let Pug = require('./Pug')
-    if (Pug.pug) koaServer.use(Pug.pug.middleware)
+    Pug.pug.use(koaServer)
 
     let Router = require('./Router')
     Router.refresh()

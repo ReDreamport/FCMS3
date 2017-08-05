@@ -193,12 +193,14 @@ function objectToMongoUpdate(object) {
     let set = {}
     let unset = {}
 
-    _.each(object, (value, key) => {
+    for (let key in object) {
+        let value = object[key]
+
         if (!_.isNil(value))
             set[key] = value
         else
             unset[key] = ""
-    })
+    }
 
     let update = {$inc: {_version: 1}}
     if (_.size(set)) update.$set = set
