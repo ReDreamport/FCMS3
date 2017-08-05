@@ -1,18 +1,23 @@
 {
-  "dependencies": {
-    "bluebird": "^3.5.0",
-    "bunyan": "^1.8.12",
-    "koa": "^2.3.0",
-    "koa-body": "^2.3.0",
-    "koa-compose": "^4.0.0",
-    "koa-pug": "^3.0.0-2",
-    "lodash": "^4.17.4",
-    "mkdirp": "^0.5.1",
-    "moment": "^2.18.1",
-    "mongodb": "^2.2.30",
-    "object-sizeof": "^1.2.0",
-    "redis": "^2.7.1",
-    "server-destroy": "^1.0.1",
-    "xml2js": "^0.4.17"
-  }
+    "name": "fcms",
+    "version": "3.0.1",
+    "description": "FAST Content Management System",
+    "dependencies": {
+        "bluebird": "^3.5.0",
+        "bunyan": "^1.8.12",
+        "koa": "^2.3.0",
+        "koa-body": "^2.3.0",
+        "koa-compose": "^4.0.0",
+        "koa-pug": "^3.0.0-2",
+        "lodash": "^4.17.4",
+        "mkdirp": "^0.5.1",
+        "moment": "^2.18.1",
+        "mongodb": "^2.2.30",
+        "nodemailer": "^4.0.1",
+        "object-sizeof": "^1.2.0",
+        "redis": "^2.7.1",
+        "request": "^2.81.0",
+        "server-destroy": "^1.0.1",
+        "xml2js": "^0.4.17"
+    }
 }

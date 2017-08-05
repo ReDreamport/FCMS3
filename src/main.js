@@ -25,6 +25,8 @@ exports.start = function (appConfig, addRouteRules) {
 async function aStart(appConfig, addRouteRules) {
     "use strict"
     Object.assign(Config, appConfig)
+    Log.config(Config)
+
     console.log("\n\n\n\n\n")
     Log.system.info('Starting FCMS...')
 

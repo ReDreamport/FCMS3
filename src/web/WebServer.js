@@ -13,8 +13,10 @@ exports.aStart = async function () {
     let koaServer = koa()
     koaServer.keys = [Config.cookieKey]
     koaServer.proxy = true
+
     // pug
-    koaServer.use(require('./Pug').pug.middleware)
+    let Pug = require('./Pug')
+    if (Pug.pug) koaServer.use(Pug.pug.middleware)
 
     let Router = require('./Router')
     Router.refresh()

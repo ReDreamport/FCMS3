@@ -1,4 +1,3 @@
-const Router = require('./Router')
 const Meta = require('../Meta')
 
 const actions = {
@@ -42,22 +41,22 @@ exports.addCommonRouteRules = function (rrr) {
     rrr.post('/api/sign-in', {}, UserHandler.aSignIn)
     rrr.post('/api/sign-out', {auth: true}, UserHandler.aSignOut)
     rrr.post('/api/change-password', {auth: true}, UserHandler.aChangePassword)
-    rrr.post('/api/reset-password', {}, UserHandler.aResetPassword)
-    rrr.post('/api/change-phone', {action: 'ChangePhone'}, UserHandler.aChangePhone)
-    rrr.post('/api/change-email', {action: 'ChangeEmail'}, UserHandler.aChangeEmail)
+    // rrr.post('/api/reset-password', {}, UserHandler.aResetPassword)
+    // rrr.post('/api/change-phone', {action: 'ChangePhone'}, UserHandler.aChangePhone)
+    // rrr.post('/api/change-email', {action: 'ChangeEmail'}, UserHandler.aChangeEmail)
 
     // ======================================
     // 安全
     // ======================================
-    let SecurityCodeHandler = require('../handler/SecurityCodeHandler')
+    // let SecurityCodeHandler = require('../handler/SecurityCodeHandler')
 
     // 发送注册验证码到手机和邮箱
-    rrr.post('/api/security-code/phone/:phone', {}, SecurityCodeHandler.aSendSignUpCodeToPhone)
-    rrr.post('/api/security-code/email/:email', {}, SecurityCodeHandler.aSendSignUpCodeToEmail)
+    // rrr.post('/api/security-code/phone/:phone', {}, SecurityCodeHandler.aSendSignUpCodeToPhone)
+    // rrr.post('/api/security-code/email/:email', {}, SecurityCodeHandler.aSendSignUpCodeToEmail)
 
-    let CaptchaHandler = require('../handler/CaptchaHandler')
+    // let CaptchaHandler = require('../handler/CaptchaHandler')
     // 请求一个图形验证码
-    rrr.get('/captcha', {}, CaptchaHandler.aGenerate)
+    // rrr.get('/captcha', {}, CaptchaHandler.aGenerate)
 
     // ======================================
     // 实体 CRUD
@@ -85,8 +84,8 @@ exports.addCommonRouteRules = function (rrr) {
     // ======================================
 
     let UploadHandler = require('../handler/UploadHandler')
-    rrr.post('/file', {action: 'Upload'}, UploadHandler.aUpload)// h5
-    rrr.post('/file2', {action: 'Upload'}, UploadHandler.aUpload2)// transport
+    rrr.post('/file', {action: 'Upload'}, UploadHandler.aUpload) // h5
+    rrr.post('/file2', {action: 'Upload'}, UploadHandler.aUpload2) // transport
     rrr.post('/rich-text-file', {action: 'RichTextUpload'}, UploadHandler.aUploadForRichText)
 
     // ======================================

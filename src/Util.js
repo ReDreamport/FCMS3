@@ -198,3 +198,33 @@ exports.typedJSONToJsObject = function (jsonObject) {
     }
 
 }
+
+exports.isUserHasFieldAction = function (user, entityName, fieldName, action) {
+    "use strict"
+    let acl = user.acl
+    if (!acl) return false
+
+    let aclField = acl.field
+    if (!aclField) return false
+
+    let aclFieldForEntity = aclField[entityName]
+    if (!aclFieldForEntity) return false
+
+    let aclFieldForEntityField = aclFieldForEntity[fieldName]
+    if (!aclFieldForEntityField) return false
+
+    return aclFieldForEntityField[action]
+}
+
+exports.isUserOrRoleHasFieldAction = function (user, entityName, fieldName, action) {
+    if (!user) return false
+    if (exports.isUserHasFieldAction(user, entityName, fieldName, action)) return true
+    if (user.roles)
+        for (let roleName in user.roles) {
+            if (user.roles.hasOwnProperty(roleName)) continue
+            let role = user.roles[roleName]
+            if (exports.isUserHasFieldAction(role, entityName, fieldName, action)) return true
+        }
+
+    return false
+}
