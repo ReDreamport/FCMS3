@@ -1,0 +1,1 @@
+exports.aKoaMiddlewareBeforeHandler = null
