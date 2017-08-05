@@ -143,7 +143,6 @@ exports.aFindOneByCriteria = async function (conn, entityName, criteria, options
 
 exports.aList = async function (conn, entityName,
                                 {repo, criteria, pageNo, pageSize, sort, includedFields, withoutTotal}) {
-    "use strict"
     let entityMeta = Meta.getEntityMeta(entityName)
 
     if (pageNo < 1) pageNo = 1

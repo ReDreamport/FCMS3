@@ -441,24 +441,6 @@ const SystemEntities = {
             sortBy: {name: 'sortBy', label: '排序字段', type: 'String', inputType: "Text", persistType: "String"},
             sortOrder: {name: 'sortOrder', label: '顺序', type: 'String', inputType: "Text", persistType: "String"}
         }
-    },
-    F_Promotion: {
-        system: true,
-        name: 'F_Promotion',
-        label: '推广活动',
-        db: Meta.DB.mongo,
-        tableName: 'F_Promotion',
-        digestFields: 'name',
-        fields: {
-            name: {
-                name: 'name',
-                label: 'KEY',
-                asFastFilter: true,
-                type: 'String',
-                inputType: "Text",
-                persistType: "String"
-            }, pagePath: {name: 'pagePath', label: '页面路径', type: 'String', inputType: "Text", persistType: "String"}
-        }
     }
 }
 

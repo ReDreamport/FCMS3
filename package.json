@@ -5,6 +5,7 @@
     "dependencies": {
         "bluebird": "^3.5.0",
         "bunyan": "^1.8.12",
+        "chance": "^1.0.10",
         "koa": "^2.3.0",
         "koa-body": "^2.3.0",
         "koa-compose": "^4.0.0",

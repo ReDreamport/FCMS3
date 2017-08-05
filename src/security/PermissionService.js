@@ -10,12 +10,12 @@ exports.permissionArrayToMap = function (acl) {
 
     if (acl.entity) {
         let entities = acl.entity
-        _.forEach(entities, (entityName, v) => entities[entityName] = Util.arrayToTrueObject(v))
+        _.each(entities, (v, entityName) => entities[entityName] = Util.arrayToTrueObject(v))
     }
     if (acl.field) {
         let entities = acl.field
-        _.forEach(entities, (entityName, e) => {
-            _.forEach(e, (fieldName, field) => field && (e[fieldName] = Util.arrayToTrueObject(field)))
+        _.each(entities, (e) => {
+            _.each(e, (field, fieldName) => field && (e[fieldName] = Util.arrayToTrueObject(field)))
         })
     }
 }

@@ -139,14 +139,14 @@ exports.aFindOneByCriteria = async function (entityMeta, criteria, o) {
     let db = await Mongo.stores[entityMeta.dbName].aDatabase()
     let c = db.collection(collectionName)
     let projection = Util.arrayToTrueObject(o && o.includedFields) || {}
-    await c.findOne(nativeCriteria, projection)
+    return await c.findOne(nativeCriteria, projection)
 }
 
 // sort 为 mongo 原生格式
 exports.aList = async function ({entityMeta, criteria, sort, repo, includedFields, pageNo, pageSize, withoutTotal}) {
     let collectionName = Meta.getCollectionName(entityMeta, repo)
     let nativeCriteria = Mongo.toMongoCriteria(criteria)
-    let includedFields = Util.arrayToTrueObject(includedFields) || {}
+    includedFields = Util.arrayToTrueObject(includedFields) || {}
 
     let db = await Mongo.stores[entityMeta.dbName].aDatabase()
     let c = db.collection(collectionName)
@@ -155,12 +155,12 @@ exports.aList = async function ({entityMeta, criteria, sort, repo, includedField
     // 判定是否分页
     if (pageSize > 0) cursor.skip((pageNo - 1) * pageSize).limit(pageSize)
 
-    let page = yield cursor.toArray()
+    let page = await cursor.toArray()
     // Log.debug('page', page)
     if (withoutTotal) {
         return page
     } else {
-        let total = yield c.count(nativeCriteria)
+        let total = await c.count(nativeCriteria)
         return {total, page}
     }
 }
@@ -193,8 +193,11 @@ function objectToMongoUpdate(object) {
     let set = {}
     let unset = {}
 
-    _.forEach(object, (key, value) => {
-        if (!_.isNil(value)) set[key] = value else unset[key] = ""
+    _.each(object, (value, key) => {
+        if (!_.isNil(value))
+            set[key] = value
+        else
+            unset[key] = ""
     })
 
     let update = {$inc: {_version: 1}}

@@ -101,9 +101,9 @@ exports.refresh = function () {
             route.routeWeight = routeWeight
 
             // Log.debug(JSON.stringify(routes, null, 4))
-            Log.system.info('routes: ' + _.size(routes))
         }
     }
+    // Log.system.info('routes: ' + _.size(routes))
 }
 
 // 解析意图
@@ -166,7 +166,7 @@ function match(method, path, params) {
             } else {
                 let newPossibleRouteUrl = collectRouteUrls(mOfIndex, part)
                 // 取交集
-                _.forEach(possibleRouteUrl, (u, v) => newPossibleRouteUrl[u] && delete possibleRouteUrl[u])
+                _.each(possibleRouteUrl, (v, u) => newPossibleRouteUrl[u] && delete possibleRouteUrl[u])
             }
             if (!_.size(possibleRouteUrl)) return null
         }
@@ -174,14 +174,16 @@ function match(method, path, params) {
         // 如果有多个匹配，变量出现位置靠后的胜出（没有变量的最胜）
         let maxRouteWeight = 0
         let finalRoute = null
-        _.forEach(possibleRouteUrl, (routeUrl) => {
+        _.each(possibleRouteUrl, (value, routeUrl) => {
             "use strict"
             let route = routes[method + routeUrl]
-            if (route.routeWeight > maxRouteWeight) finalRoute = route
-            maxRouteWeight = route.routeWeight
+            if (route.routeWeight > maxRouteWeight) {
+                finalRoute = route
+                maxRouteWeight = route.routeWeight
+            }
         })
 
-        _.forEach(finalRoute.indexToVariable, (name, index) => params[name] = parts[index])
+        _.each(finalRoute.indexToVariable, (index, name) => params[name] = parts[index])
         return finalRoute
     }
 }

@@ -9,8 +9,8 @@ const Extension = require('../Extension')
 let server = null
 
 exports.aStart = async function () {
-    let koa = require('koa')
-    let koaServer = koa()
+    let Koa = require('koa')
+    let koaServer = new Koa()
     koaServer.keys = [Config.cookieKey]
     koaServer.proxy = true
 

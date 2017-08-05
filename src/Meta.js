@@ -4,7 +4,7 @@ const ObjectId = require('mongodb').ObjectId
 const path = require('path')
 
 const Util = require('./Util')
-const Log = require('./log')
+const Log = require('./Log')
 
 const Mongo = require('./storage/Mongo')
 const Redis = require('./storage/Redis')
@@ -69,7 +69,7 @@ exports.aLoad = async function () {
     let entitiesList = await c.find({}).toArray()
 
     // 下面没有异步操作
-    let entities = {}
+    entities = {}
     for (let e of entitiesList) entities[e.name] = e
 
     Object.assign(entities, SystemMeta.SystemEntities)
@@ -110,7 +110,7 @@ exports.parseEntity = function (entityInput, entityMeta) {
     if (!_.isObject(entityInput)) return undefined
     let entityValue = {}
     let fields = entityMeta.fields
-    _.forEach(fields, (fName, fMeta) => {
+    _.each(fields, (fMeta, fName) => {
         "use strict"
         let fv = exports.parseFieldValue(entityInput[fName], fMeta)
         // undefined / NaN 去掉，null 保留！
@@ -242,7 +242,7 @@ exports.formatEntityToHttp = function (entityValue, entityMeta) {
 
     let output = {}
 
-    _.forEach(entityMeta.fields, (fName, fieldMeta) => {
+    _.each(entityMeta.fields, (fieldMeta, fName) => {
         let o = exports.formatFieldToHttp(entityValue[fName], fieldMeta)
         if (!_.isUndefined(o)) output[fName] = o
     })

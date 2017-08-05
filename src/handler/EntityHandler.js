@@ -26,7 +26,7 @@ exports.aCreateEntity = async function (ctx) {
     exports.removeNoCreateFields(entityMeta, ctx.state.user, instance)
 
     let fieldCount = 0
-    _.forEach(instance, (key, value) => _.isNull(value) ? delete instance[key] : fieldCount++)
+    _.each(instance, (value, key) => _.isNull(value) ? delete instance[key] : fieldCount++)
     if (!fieldCount) throw new Error.UserError("EmptyOperation")
 
     operator = ctx.state.user
@@ -239,7 +239,7 @@ exports.parseListQuery = function (entityMeta, query) {
         let orList = []
         orList.push({field: "_id", operator: "==", value: fastFilter})
 
-        _.forEach(entityMeta.fields, (fieldName, fieldMeta) => {
+        _.each(entityMeta.fields, (fieldMeta, fieldName) => {
             if (fieldMeta.asFastFilter) orList.push({field: fieldName, operator: "contain", value: fastFilter})
         })
 
@@ -253,7 +253,7 @@ exports.parseListQuery = function (entityMeta, query) {
             }
         } else {
             let criteriaList = []
-            _.forEach(query, (key, value) => {
+            _.each(query, (value, key) => {
                 if (entityMeta.fields[key]) criteriaList.push({field: key, operator: "==", value: value})
             })
 
@@ -315,13 +315,12 @@ exports.aRemoveFilters = async function (ctx) {
 
 // 过滤掉不显示的字段
 exports.removeNotShownFields = function (entityMeta, user, ...entities) {
-    "use strict"
     if (!(entities && entities.length)) return
 
     let fields = entityMeta.fields
 
     let removedFieldNames = []
-    _.forEach(fields, (fieldName, fieldMeta) => {
+    _.each(fields, (fieldMeta, fieldName) => {
         "use strict"
         if (fieldMeta.type === 'Password')
             removedFieldNames.push(fieldName)
@@ -345,7 +344,7 @@ exports.removeNoCreateFields = function (entityMeta, user, entity) {
     let fields = entityMeta.fields
 
     let removedFieldNames = []
-    _.forEach(fields, (fieldName, fieldMeta) => {
+    _.each(fields, (fieldMeta, fieldName) => {
         "use strict"
         if (fieldMeta.noCreate && !Util.isUserOrRoleHasFieldAction(user, entityMeta.name, fieldName, 'create')) {
             removedFieldNames.push(fieldName)
@@ -364,7 +363,7 @@ exports.removeNoEditFields = function (entityMeta, user, entity) {
     let fields = entityMeta.fields
 
     let removedFieldNames = []
-    _.forEach(fields, (fieldName, fieldMeta) => {
+    _.each(fields, (fieldMeta, fieldName) => {
         "use strict"
         if ((fieldMeta.noEdit || fieldMeta.editReadonly)
             && !Util.isUserOrRoleHasFieldAction(user, entityMeta.name, fieldName, 'edit')) {

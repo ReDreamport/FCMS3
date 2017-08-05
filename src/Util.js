@@ -191,7 +191,7 @@ exports.typedJSONToJsObject = function (jsonObject) {
         return jsonObject
     } else if (_.isObject(jsonObject)) {
         let jsObject = {}
-        _.forEach(jsonObject, (k, v) => jsObject[k] = removeType(v))
+        _.each(jsonObject, (v, k) => jsObject[k] = removeType(v))
         return jsObject
     } else {
         return jsonObject
