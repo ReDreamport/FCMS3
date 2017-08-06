@@ -870,6 +870,52 @@ const SystemEntities = {
                 inputType: "Text",
                 persistType: "String" }
         }
+    },
+    F_SsoSession: {
+        system: true,
+        name: 'F_SsoSession',
+        label: 'SSoSession',
+        db: Meta.DB.mongo,
+        dbName: "main",
+        tableName: 'F_SsoSession',
+        fields: {
+            userId: { name: 'userId',
+                label: '用户ID',
+                type: 'String',
+                inputType: "Text",
+                persistType: "String" },
+            userToken: { name: 'userToken',
+                label: '用户TOKEN',
+                type: 'String',
+                inputType: "Text",
+                persistType: "String" },
+            expireAt: { name: 'expireAt',
+                label: '过期时间',
+                type: 'Int',
+                inputType: "Int",
+                persistType: "Int" }
+        }
+    },
+    F_SsoClientToken: {
+        system: true,
+        name: 'F_SsoClientToken',
+        label: 'SSO客户端授权',
+        db: Meta.DB.mongo,
+        dbName: "main",
+        tableName: 'F_SsoClientToken',
+        digestFields: 'name,entityName',
+        fields: {
+            origin: { name: 'origin',
+                label: '客户端域',
+                type: 'String',
+                inputType: "Text",
+                persistType: "String" },
+            entityName: { name: 'token',
+                label: '授权令牌',
+                type: 'String',
+                inputType: "Text",
+                persistType: "String" }
+        }
     }
 }
 

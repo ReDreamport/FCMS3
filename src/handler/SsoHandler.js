@@ -1,10 +1,13 @@
 const chance = new require('chance')()
 const { URL } = require('url')
+const rp = require('request-promise-native')
 
+const Meta = require('../Meta')
 const Log = require('../Log')
 const Config = require('../Config')
 const Error = require('../Error')
 const EntityService = require('../service/EntityService')
+const UserService = require('../security/UserService')
 
 // SSO 客户端请求该接口
 // 如果 SSO 已登录，则产生一个 TOKEN 回调客户端校验 TOKEN 的接口
@@ -13,17 +16,18 @@ exports.aAuth = async function (ctx) {
     let userId = ctx.cookies.get('SsoUserId', { signed: true })
     let userToken = ctx.cookies.get('SsoUserToken', { signed: true })
 
-    let session = await aValidSsoSession(userId, userToken)
-    if (!session) {
-        let redirect = ctx.request.origin + "/sso/sign-in"
-        ctx.body = { redirect, auth: false }
-        return
-    }
-
     let callback = ctx.query.callback
     if (!callback)
         throw new Error.UserError("MissingCallback", "Missing Callback")
     let encodedCallback = encodeURIComponent(callback)
+
+    let session = await aValidSsoSession(userId, userToken)
+    if (!session) {
+        let redirect = ctx.request.origin
+            + `/sso/sign-in?callback=${encodedCallback}`
+        ctx.redirect(redirect)
+        return
+    }
 
     let callbackUrl = new URL(callback)
     let callbackOrigin = callbackUrl.origin // http://www.baidu.com:80
@@ -32,15 +36,30 @@ exports.aAuth = async function (ctx) {
         throw new Error.UserError("UnkownClient",
             "Unkown Client: " + callbackOrigin)
 
-    let { validateSsoTokenUrl } = clientConfig
+    let { acceptTokenUrl } = clientConfig
 
-    let token = await aNewClientToken(callbackOrigin)
-    validateSsoTokenUrl += `?callback=${encodedCallback}&token=${token}`
+    let token = await aNewClientToken(callbackOrigin, userId)
+    token = encodeURIComponent(token)
 
-    ctx.body = { redirect: validateSsoTokenUrl, auth: true }
+    acceptTokenUrl += `?callback=${encodedCallback}&token=${token}`
+    ctx.redirect(acceptTokenUrl)
 }
 
-// SSO 客户端校验 TOKEN 的真实性。真实返回 204，否则返回 400。
+exports.aSignIn = async function (ctx) {
+    let req = ctx.request.body
+    if (!(req.username && req.password)) return ctx.status = 400
+
+    let session = await aSignIn(req.username, req.password)
+    // Log.debug('sso sign in', session)
+    ctx.body = { userId: session.userId }
+
+    ctx.cookies.set('SsoUserId', session.userId,
+        { signed: true, httpOnly: true })
+    ctx.cookies.set('SsoUserToken', session.userToken,
+        { signed: true, httpOnly: true })
+}
+
+// SSO 校验客户端接受到的 TOKEN 的真实性
 exports.aValidateToken = async function (ctx) {
     let req = ctx.request.body
     if (!req) return ctx.status = 400
@@ -65,7 +84,50 @@ exports.aValidateToken = async function (ctx) {
     if (Date.now() - ct._createdOn.getTime() > 10000)
         throw new Error.UserError("TokenExpired", "Token Expired")
 
-    ctx.status = 204
+    ctx.body = { userId: ct.userId }
+}
+
+// SSO 客户端接收 SSO 服务器的 TOKEN 回调
+exports.aAcceptToken = async function (ctx) {
+    let token = ctx.query.token
+    let origin = ctx.request.origin
+
+    let originConfig = Config.originConfigs[origin]
+    if (!originConfig) throw new Error.UserError("BadClient", "Bad Client")
+
+    let callback = ctx.query.callback
+    callback = callback ? decodeURIComponent(callback)
+        : originConfig.defaultCallbackUrl
+
+    let options = {
+        method: 'POST',
+        uri: originConfig.validateSsoTokenUrl,
+        body: { key: originConfig.ssoKey, token, origin },
+        json: true
+    }
+    try {
+        let res = await rp(options)
+        Log.debug("res", res)
+        if (!res)
+            throw new Error.SystemError("ValidateTokenFail",
+                "Failed to Validate Token")
+
+        let userId = res.userId
+        let user = await EntityService.aFindOneById({}, 'F_User', userId)
+
+        let session = await UserService.aSignInSuccessfully(origin, user)
+
+        // TODO 把设置本机登录 Cookies 的放在一处
+        ctx.cookies.set('UserId', session.userId,
+            { signed: true, httpOnly: true })
+        ctx.cookies.set('UserToken', session.userToken,
+            { signed: true, httpOnly: true })
+
+        ctx.redirect(callback)
+    } catch (e) {
+        Log.system.error(e, "Failed to validate SSO token")
+        throw e
+    }
 }
 
 async function aValidSsoSession(userId, userToken) {
@@ -87,11 +149,46 @@ async function aValidSsoSession(userId, userToken) {
 }
 
 // origin 的形式是 http://www.baidu.com:80
-async function aNewClientToken(origin) {
+async function aNewClientToken(origin, userId) {
     let token = chance.string({ length: 24 })
 
     // TODO 记录客户浏览器的 IP，记录此 TOKEN 授予的 IP
-    let ct = { origin, token, _createdOn: new Date() }
+    let ct = { userId, origin, token, _createdOn: new Date() }
     await EntityService.aCreate({}, 'F_SsoClientToken', ct)
     return token
+}
+
+async function aSignIn(username, password) {
+    if (!password) throw new Error.UserError("PasswordNotMatch")
+
+    let usernameFields = Config.usernameFields
+    if (!(usernameFields && usernameFields.length))
+        usernameFields = ["username", "phone", "email"]
+
+    let matchFields = []
+    for (let f of usernameFields)
+        matchFields.push({ field: f, operator: "==", value: username })
+    let criteria = { __type: 'relation', relation: 'or', items: matchFields }
+
+    let user = await EntityService.aFindOneByCriteria({}, 'F_User', criteria)
+
+    if (!user) throw new Error.UserError("UserNotExisted")
+    if (user.disabled) throw new Error.UserError("UserDisabled")
+    if (Meta.hashPassword(password) !== user.password)
+        throw new Error.UserError("PasswordNotMatch")
+
+    let session = {}
+    session.userId = user._id
+    session.userToken = chance.string({ length: 24 })
+    session.expireAt = Date.now() + Config.sessionExpireAtServer
+
+    await aSignOut(user._id) // 先退出
+    await EntityService.aCreate({}, 'F_SsoSession', session)
+
+    return session
+}
+
+async function aSignOut(userId) {
+    let criteria = { userId }
+    await EntityService.aRemoveManyByCriteria({}, 'F_SsoSession', criteria)
 }

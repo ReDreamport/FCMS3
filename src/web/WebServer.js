@@ -74,8 +74,7 @@ async function aCatchError(ctx, next) {
             if (e instanceof Error.Error401) {
                 let originConfig = Config.originConfigs[ctx.request.origin]
                 // console.log(originConfig, originConfig)
-                let href = encodeURIComponent(ctx.request.href)
-                let signInUrl = originConfig.signInUrl + '?callback=' + href
+                let signInUrl = originConfig.signInUrl
                 if (routeInfo.isPage) {
                     ctx.redirect(signInUrl)
                 } else {

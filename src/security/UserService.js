@@ -146,6 +146,12 @@ exports.aSignIn = async function (origin, username, password) {
     if (Meta.hashPassword(password) !== user.password)
         throw new Error.UserError("PasswordNotMatch")
 
+    let session = await exports.aSignInSuccessfully(origin, user)
+
+    return session
+}
+
+exports.aSignInSuccessfully = async function (origin, user) {
     let session = {}
     session.origin = origin
     session.userId = user._id
