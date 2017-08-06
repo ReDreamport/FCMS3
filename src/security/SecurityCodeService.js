@@ -22,7 +22,8 @@ exports.aCheck = async function (target, code) {
 // 发送验证码到邮箱
 exports.aSendSecurityCodeToEmail = async function (toEmail, subject, purpose) {
     let code = await aGenerateSecurityCode(toEmail)
-    return await MailService.aSendEmail(toEmail, subject, `您好，本次操作的验证码是 ${code}。${purpose}。`)
+    return await MailService.aSendEmail(toEmail, subject,
+        `您好，本次操作的验证码是 ${code}。${purpose}。`)
 }
 
 // TODO 发送验证码到手机
@@ -50,7 +51,8 @@ exports.aSendSecurityCodeToEmail = async function (toEmail, subject, purpose) {
 //
 
 async function aGenerateSecurityCode(address) {
-    let code = chance.string({length: 6, pool: '0123456789'})
-    await Cache.aSetString(['securityCodes', address], {code: code, sendTime: new Date().getTime()})
+    let code = chance.string({ length: 6, pool: '0123456789' })
+    await Cache.aSetString(['securityCodes', address],
+        { code: code, sendTime: new Date().getTime() })
     return code
 }

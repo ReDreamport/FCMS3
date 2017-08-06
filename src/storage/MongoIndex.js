@@ -24,7 +24,7 @@ exports.aSyncWithMeta = async function () {
                     let fc = f.split(":")
                     fields[fc[0]] = parseInt(fc[1], 10)
                 }
-                let options = {name: tableName + "_" + i.name}
+                let options = { name: tableName + "_" + i.name }
                 if (i.unique) options.unique = true
                 if (i.sparse) options.sparse = true
 

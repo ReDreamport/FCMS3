@@ -32,12 +32,14 @@ exports.aStart = async function () {
     // 控制访问之后再解析正文
     let koaBody = require('koa-body')
     let formidableConfig = {
-        uploadDir: Config.uploadPath, keepExtensions: true,
+        uploadDir: Config.uploadPath,
+        keepExtensions: true,
         maxFieldsSize: Config.httpBodyMaxFieldsSize
     }
-    koaServer.use(koaBody({multipart: true, formidable: formidableConfig}))
+    koaServer.use(koaBody({ multipart: true, formidable: formidableConfig }))
 
-    if (Extension.aKoaMiddlewareBeforeHandler) koaServer.use(Extension.aKoaMiddlewareBeforeHandler)
+    if (Extension.aKoaMiddlewareBeforeHandler)
+        koaServer.use(Extension.aKoaMiddlewareBeforeHandler)
 
     koaServer.use(Router.aHandleRoute) // 开始处理路由
 

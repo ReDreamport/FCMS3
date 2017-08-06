@@ -27,7 +27,8 @@ exports.aInit = async function () {
         let asyncHandlers = subscribers[channel]
         if (asyncHandlers)
             for (let asyncHandler of asyncHandlers)
-                asyncHandler(message).catch((e) => Log.system.error(e, "handle message"))
+                asyncHandler(message).catch((e) =>
+                    Log.system.error(e, "handle message"))
     })
 
     await subscriberClient.subscribeAsync('test', 'MetaChange')

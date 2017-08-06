@@ -22,7 +22,8 @@ exports.aWithCache = async function (entityMeta, cacheId, aQuery) {
     else {
         let keys = _.concat(['Entity', entityMeta.name], cacheId)
         let cacheItem = await Cache.aGetObject(keys)
-        if (!_.isNil(cacheItem)) return _.cloneDeep(cacheItem)  // 返回拷贝，以防止污染缓存
+        if (!_.isNil(cacheItem))
+            return _.cloneDeep(cacheItem) // 返回拷贝，以防止污染缓存
 
         let freshValue = await aQuery()
         if (_.isNil(cacheItem)) return freshValue // TODO 空值暂不缓存
@@ -96,7 +97,8 @@ exports.aFireEntityRemoved = async function (ctx, entityMeta, ids) {
 async function aRemoveOneCacheByIds(entityMeta, ids) {
     "use strict"
     if (ids) {
-        for (let id of ids) await Cache.aUnset(['Entity', entityMeta.name, 'Id', id])
+        for (let id of ids)
+            await Cache.aUnset(['Entity', entityMeta.name, 'Id', id])
     } else {
         await Cache.aUnset(['Entity', entityMeta.name, 'Id'])
     }

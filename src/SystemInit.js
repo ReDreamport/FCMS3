@@ -8,13 +8,16 @@ exports.aInit = async function () {
 }
 
 async function aCreateAdminUser() {
-    let hasAdmin = await EntityService.aFindOneByCriteria(null, 'F_User', {admin: true})
+    let hasAdmin = await EntityService.aFindOneByCriteria(null, 'F_User',
+        { admin: true })
     if (hasAdmin) return
 
     Log.system.info('Create default admin user')
     await EntityService.aCreate(null, 'F_User', {
-        _id: Meta.newObjectId().toString(), admin: true,
-        username: 'admin', password: Meta.hashPassword('admin'),
+        _id: Meta.newObjectId().toString(),
+        admin: true,
+        username: 'admin',
+        password: Meta.hashPassword('admin'),
     })
 }
 
@@ -32,8 +35,12 @@ const defaultMenu = {
         {
             "label": null,
             "menuItems": [
-                {"label": "用户", "toEntity": "F_User", "callFunc": null},
-                {"label": "Meta", "toEntity": null, "callFunc": "F.toMetaIndex"}
+                { "label": "用户",
+                    "toEntity": "F_User",
+                    "callFunc": null },
+                { "label": "Meta",
+                    "toEntity": null,
+                    "callFunc": "F.toMetaIndex" }
             ]
         }
     ]

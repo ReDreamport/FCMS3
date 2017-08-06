@@ -60,7 +60,8 @@ async function aStart(appConfig, addRouteRules) {
 
     // 路由表
     const router = require('./web/Router')
-    const rrr = new router.RouteRuleRegisters(Config.urlPrefix, Config.errorCatcher)
+    const rrr = new router.RouteRuleRegisters(Config.urlPrefix,
+        Config.errorCatcher)
 
     const CommonRouterRules = require('./web/CommonRouterRules')
     CommonRouterRules.addCommonRouteRules(rrr)

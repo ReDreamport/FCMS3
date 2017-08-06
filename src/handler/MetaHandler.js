@@ -52,7 +52,7 @@ exports.aRemoveMeta = async function (ctx) {
 }
 
 exports.aGetEmptyEntityMeta = async function (ctx) {
-    let e = {fields: {}, db: Meta.DB.mongo}
+    let e = { fields: {}, db: Meta.DB.mongo }
     SystemMeta.patchSystemFields(e)
     ctx.body = e
 }

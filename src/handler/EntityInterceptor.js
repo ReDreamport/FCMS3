@@ -24,5 +24,6 @@ exports.setInterceptor = function (entityName, actions, asyncInterceptor) {
 
 exports.getInterceptor = function (entityName, action) {
     let asyncInterceptorOfEntity = asyncInterceptors[entityName]
-    return asyncInterceptorOfEntity && asyncInterceptorOfEntity[action] || defaultAsyncInterceptor
+    return asyncInterceptorOfEntity && asyncInterceptorOfEntity[action]
+        || defaultAsyncInterceptor
 }

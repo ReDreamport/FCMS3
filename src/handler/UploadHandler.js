@@ -16,19 +16,23 @@ async function aUpload(files, query) {
     if (!(entityName && fieldName)) return false
 
     let entityMeta = Meta.getEntityMeta(entityName)
-    if (!entityMeta) throw new Error.UserError("NoSuchEntity", "无此实体 " + entityName)
+    if (!entityMeta)
+        throw new Error.UserError("NoSuchEntity", "无此实体 " + entityName)
     let fieldMeta = entityMeta.fields[fieldName]
-    if (!fieldMeta) throw new Error.UserError("NoSuchEntityField", `无此字段 ${entityName}.${fieldName}`)
+    if (!fieldMeta)
+        throw new Error.UserError("NoSuchEntityField",
+            `无此字段 ${entityName}.${fieldName}`)
 
     let subDir = fieldMeta.fileStoreDir || "default"
     let fileTargetDir = path.join(Config.fileDir, subDir)
 
-    let fileFinalFullPath = path.join(fileTargetDir, Meta.newObjectId().toString() + path.extname(file.path))
+    let fileFinalFullPath = path.join(fileTargetDir,
+        Meta.newObjectId().toString() + path.extname(file.path))
     await FileUtil.aMoveFileTo(file.path, fileFinalFullPath)
 
     let fileRelativePath = path.relative(Config.fileDir, fileFinalFullPath)
 
-    return {fileRelativePath: fileRelativePath, fileSize: file.size}
+    return { fileRelativePath: fileRelativePath, fileSize: file.size }
 }
 
 // H5上传
@@ -47,8 +51,9 @@ exports.aUpload2 = async function (ctx) {
     if (result)
         result.success = true
     else
-        result = {success: false}
-    ctx.body = '<textarea data-type="application/json">' + JSON.stringify(result) + '</textarea>'
+        result = { success: false }
+    ctx.body = '<textarea data-type="application/json">'
+        + JSON.stringify(result) + '</textarea>'
 }
 
 // WangEditor 使用的图片上传接口
@@ -68,10 +73,11 @@ exports.aUploadUtil = async function (file, subDir) {
 
     let fileSize = file.size
 
-    let fileFinalFullPath = path.join(fileTargetDir, Meta.newObjectId().toString() + path.extname(file.path))
+    let fileFinalFullPath = path.join(fileTargetDir,
+        Meta.newObjectId().toString() + path.extname(file.path))
     await FileUtil.aMoveFileTo(file.path, fileFinalFullPath)
 
     let fileRelativePath = path.relative(Config.fileDir, fileFinalFullPath)
 
-    return {fileRelativePath: fileRelativePath, fileSize: fileSize}
+    return { fileRelativePath: fileRelativePath, fileSize: fileSize }
 }

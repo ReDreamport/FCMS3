@@ -21,12 +21,13 @@ exports.aCreate = async function (entityMeta, instance) {
         return Mongo.getInsertedIdObject(res)
     } catch (e) {
         if (!Mongo.isIndexConflictError(e)) throw e
-        let {code, message} = errorToDupKeyError(e, entityMeta)
+        let { code, message } = errorToDupKeyError(e, entityMeta)
         throw new Error.UniqueConflictError(code, message)
     }
 }
 
-exports.aUpdateManyByCriteria = async function (entityMeta, criteria, instance) {
+exports.aUpdateManyByCriteria = async function (entityMeta, criteria,
+    instance) {
     let update = objectToMongoUpdate(instance)
     if (!update) return 0
 
@@ -41,7 +42,7 @@ exports.aUpdateManyByCriteria = async function (entityMeta, criteria, instance) 
         return r.modifiedCount
     } catch (e) {
         if (!Mongo.isIndexConflictError(e)) throw e
-        let {code, message} = errorToDupKeyError(e, entityMeta)
+        let { code, message } = errorToDupKeyError(e, entityMeta)
         throw new Error.UniqueConflictError(code, message)
     }
 }
@@ -61,7 +62,7 @@ exports.aUpdateOneByCriteria = async function (entityMeta, criteria, instance) {
         r = Mongo.getUpdateResult(res)
     } catch (e) {
         if (!Mongo.isIndexConflictError(e)) throw e
-        let {code, message} = errorToDupKeyError(e, entityMeta)
+        let { code, message } = errorToDupKeyError(e, entityMeta)
         throw new Error.UniqueConflictError(code, message)
     }
 
@@ -113,7 +114,7 @@ exports.aRecoverMany = async function (entityMeta, ids) {
     let formalCollection = db.collection(entityMeta.tableName)
     let trashCollection = db.collection(trashTable)
 
-    let list = await trashCollection.find({_id: {$in: ids}}).toArray()
+    let list = await trashCollection.find({ _id: { $in: ids } }).toArray()
 
     for (let entity of list) {
         entity._modifiedOn = new Date()
@@ -124,11 +125,11 @@ exports.aRecoverMany = async function (entityMeta, ids) {
         await formalCollection.insertMany(list)
     } catch (e) {
         if (!Mongo.isIndexConflictError(e)) throw e
-        let {code, message} = errorToDupKeyError(e, entityMeta)
+        let { code, message } = errorToDupKeyError(e, entityMeta)
         throw new Error.UniqueConflictError(code, message)
     }
 
-    await trashCollection.deleteMany({_id: {$in: ids}})
+    await trashCollection.deleteMany({ _id: { $in: ids } })
 }
 
 exports.aFindOneByCriteria = async function (entityMeta, criteria, o) {
@@ -143,7 +144,9 @@ exports.aFindOneByCriteria = async function (entityMeta, criteria, o) {
 }
 
 // sort 为 mongo 原生格式
-exports.aList = async function ({entityMeta, criteria, sort, repo, includedFields, pageNo, pageSize, withoutTotal}) {
+exports.aList = async function (options) {
+    let { entityMeta, criteria, sort,
+        repo, includedFields, pageNo, pageSize, withoutTotal } = options
     let collectionName = Meta.getCollectionName(entityMeta, repo)
     let nativeCriteria = Mongo.toMongoCriteria(criteria)
     includedFields = Util.arrayToTrueObject(includedFields) || {}
@@ -161,7 +164,7 @@ exports.aList = async function ({entityMeta, criteria, sort, repo, includedField
         return page
     } else {
         let total = await c.count(nativeCriteria)
-        return {total, page}
+        return { total, page }
     }
 }
 
@@ -174,12 +177,14 @@ function errorToDupKeyError(e, entityMeta) {
         // let value = matches[3]
         Log.debug('toDupKeyError, indexName=' + indexName)
 
-        let indexConfig = _.find(entityMeta.mongoIndexes, (i) => entityMeta.tableName + "_" + i.name === indexName)
+        let indexConfig = _.find(entityMeta.mongoIndexes, (i) =>
+            entityMeta.tableName + "_" + i.name === indexName)
         if (!indexConfig) Log.system.warn('No index config for ' + indexName)
-        let message = indexConfig && indexConfig.errorMessage || `值重复：${indexName}`
-        return {code: "DupKey", message, key: indexName}
+        let message = indexConfig && indexConfig.errorMessage
+            || `值重复：${indexName}`
+        return { code: "DupKey", message, key: indexName }
     } else {
-        return {code: "DupKey", message: e.message, key: null}
+        return { code: "DupKey", message: e.message, key: null }
     }
 }
 
@@ -202,7 +207,7 @@ function objectToMongoUpdate(object) {
             unset[key] = ""
     }
 
-    let update = {$inc: {_version: 1}}
+    let update = { $inc: { _version: 1 } }
     if (_.size(set)) update.$set = set
     if (_.size(unset)) update.$unset = unset
 

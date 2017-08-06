@@ -33,15 +33,17 @@ exports.aCreateEntity = async function (ctx) {
     let operator = ctx.state.user
     instance._createdBy = operator && operator._id
 
-    let aIntercept = Interceptor.getInterceptor(entityName, Interceptor.Actions.Create)
+    let aIntercept = Interceptor.getInterceptor(entityName,
+        Interceptor.Actions.Create)
 
     let r = await EntityService.aWithTransaction(entityMeta, async (conn) => {
         return await aIntercept(conn, instance, operator, async () => {
-            return await EntityService.aCreate(conn, entityName, instance)
+            return await EntityService.aCreate(conn,
+                entityName, instance)
         })
     })
 
-    ctx.body = {id: r._id}
+    ctx.body = { id: r._id }
 }
 
 exports.aUpdateEntityById = async function (ctx) {
@@ -56,7 +58,7 @@ exports.aUpdateEntityById = async function (ctx) {
 
     let instance = ctx.request.body
 
-    let criteria = {_id, _version: instance._version}
+    let criteria = { _id, _version: instance._version }
 
     instance = Meta.parseEntity(instance, entityMeta)
     exports.removeNoEditFields(entityMeta, ctx.state.user, instance)
@@ -64,12 +66,15 @@ exports.aUpdateEntityById = async function (ctx) {
     let operator = ctx.state.user
     instance._modifiedBy = operator && operator._id
 
-    let aIntercept = Interceptor.getInterceptor(entityName, Interceptor.Actions.Update)
+    let aIntercept = Interceptor.getInterceptor(entityName,
+        Interceptor.Actions.Update)
 
     await EntityService.aWithTransaction(entityMeta, async (conn) => {
-        return await aIntercept(conn, criteria, instance, operator, async () => {
-            return await EntityService.aUpdateOneByCriteria(conn, entityName, criteria, instance)
-        })
+        return await aIntercept(conn, criteria, instance, operator,
+            async () => {
+                return await EntityService.aUpdateOneByCriteria(
+                    conn, entityName, criteria, instance)
+            })
     })
 
     ctx.status = 204
@@ -95,15 +100,18 @@ exports.aUpdateEntityInBatch = async function (ctx) {
     let operator = ctx.state.user
     patch._modifiedBy = operator && operator._id
 
-    let aIntercept = Interceptor.getInterceptor(entityName, Interceptor.Actions.Update)
+    let aIntercept = Interceptor.getInterceptor(entityName,
+        Interceptor.Actions.Update)
 
     await EntityService.aWithTransaction(entityMeta, async (conn) => {
         for (let p of idVersions) {
-            let criteria = {_id: p.id, _version: p._version}
-            return await aIntercept(conn, criteria, patch, operator, async (conn) => {
-                return await EntityService.aUpdateOneByCriteria(conn, entityName, criteria, patch)
+            let criteria = { _id: p.id, _version: p._version }
+            return await aIntercept(conn, criteria, patch, operator,
+                async (conn) => {
+                    return await EntityService.aUpdateOneByCriteria(
+                        conn, entityName, criteria, patch)
 
-            })
+                })
         }
     })
 
@@ -124,14 +132,24 @@ exports.aDeleteEntityInBatch = async function (ctx) {
     ids = Meta.parseIds(ids, entityMeta)
     if (!ids.length > 0) throw new Error.UserError('EmptyOperation')
 
-    let criteria = {__type: 'relation', relation: 'and', items: [{field: '_id', operator: 'in', value: ids}]}
+    let criteria = {
+        __type: 'relation',
+        relation: 'and',
+        items: [{
+            field: '_id',
+            operator: 'in',
+            value: ids
+        }]
+    }
 
     let operator = ctx.state.user
-    let aIntercept = Interceptor.getInterceptor(entityName, Interceptor.Actions.Remove)
+    let aIntercept = Interceptor.getInterceptor(entityName,
+        Interceptor.Actions.Remove)
 
     await EntityService.aWithTransaction(entityMeta, async (conn) => {
         return await aIntercept(conn, criteria, operator, async () => {
-            return await EntityService.aRemoveManyByCriteria(conn, entityName, criteria)
+            return await EntityService.aRemoveManyByCriteria(
+                conn, entityName, criteria)
         })
     })
 
@@ -146,7 +164,7 @@ exports.aRecoverInBatch = async function (ctx) {
 
     let req = ctx.request.body || {}
     let ids = req.ids
-    if (!( ids && ids.length > 0)) throw new Error.UserError('EmptyOperation')
+    if (!(ids && ids.length > 0)) throw new Error.UserError('EmptyOperation')
 
     ids = Meta.parseIds(ids, entityMeta)
     if (!ids.length > 0) throw new Error.UserError('EmptyOperation')
@@ -167,23 +185,27 @@ exports.aFindOneById = async function (ctx) {
     let _id = Meta.parseId(ctx.params.id, entityMeta)
     if (!_id) return ctx.status = 404
 
-    let aIntercept = Interceptor.getInterceptor(entityName, Interceptor.Actions.Get)
+    let aIntercept = Interceptor.getInterceptor(entityName,
+        Interceptor.Actions.Get)
     let operator = ctx.state.user
 
-    let criteria = {_id}
+    let criteria = { _id }
 
-    let entity = await EntityService.aWithoutTransaction(entityMeta, async (conn) => {
-        return await aIntercept(conn, criteria, operator, async () => {
-            return await EntityService.aFindOneByCriteria(conn, entityName, criteria, {repo: ctx.query && ctx.query._repo})
+    let entity = await EntityService.aWithoutTransaction(entityMeta,
+        async (conn) => {
+            return await aIntercept(conn, criteria, operator, async () => {
+                return await EntityService.aFindOneByCriteria(
+                    conn, entityName, criteria, {
+                        repo: ctx.query && ctx.query._repo
+                    })
+            })
         })
-    })
 
     if (entity) {
         exports.removeNotShownFields(entityMeta, ctx.state.user, entity)
         entity = Meta.formatEntityToHttp(entity, entityMeta)
         ctx.body = entity
-    }
-    else {
+    } else {
         ctx.status = 404
     }
 }
@@ -195,14 +217,16 @@ exports.aList = async function (ctx) {
 
     let query = exports.parseListQuery(entityMeta, ctx.query)
 
-    let gIntercept = Interceptor.getInterceptor(entityName, Interceptor.Actions.List)
+    let gIntercept = Interceptor.getInterceptor(entityName,
+        Interceptor.Actions.List)
     let operator = ctx.state.user
 
-    let r = await EntityService.aWithoutTransaction(entityMeta, async (conn) => {
-        return await gIntercept(conn, query, operator, async () => {
-            return await EntityService.aList(conn, entityName, query)
+    let r = await EntityService.aWithoutTransaction(entityMeta,
+        async (conn) => {
+            return await gIntercept(conn, query, operator, async () => {
+                return await EntityService.aList(conn, entityName, query)
+            })
         })
-    })
 
     let page = r.page
     exports.removeNotShownFields(entityMeta, ctx.state.user, ...page)
@@ -217,7 +241,8 @@ exports.aList = async function (ctx) {
 
 exports.parseListQuery = function (entityMeta, query) {
     if (!query) return {}
-    let criteria, sort, includedFields = Util.splitString(query._includedFields, ",")
+    let criteria, sort
+    let includedFields = Util.splitString(query._includedFields, ",")
 
     let digest = query._digest === 'true'
     if (digest)
@@ -232,19 +257,23 @@ exports.parseListQuery = function (entityMeta, query) {
 
     let pageNo = Util.stringToInt(query._pageNo, 1)
     let pageSize = Util.stringToInt(query._pageSize, (digest && -1 || 20))
-    if (pageSize > 200) pageSize = 200  // TODO 控制量
+    if (pageSize > 200) pageSize = 200 // TODO 控制量
 
     // 整理筛选查询条件
     let fastFilter = query._filter
     if (fastFilter) {
         let orList = []
-        orList.push({field: "_id", operator: "==", value: fastFilter})
+        orList.push({ field: "_id", operator: "==", value: fastFilter })
 
         for (let fieldName in entityMeta.fields) {
             let fieldMeta = entityMeta.fields[fieldName]
-            if (fieldMeta.asFastFilter) orList.push({field: fieldName, operator: "contain", value: fastFilter})
+            if (fieldMeta.asFastFilter) orList.push({
+                field: fieldName,
+                operator: "contain",
+                value: fastFilter
+            })
         }
-        criteria = {__type: 'relation', relation: "or", items: orList}
+        criteria = { __type: 'relation', relation: "or", items: orList }
     } else {
         if (query._criteria) {
             try {
@@ -256,10 +285,18 @@ exports.parseListQuery = function (entityMeta, query) {
             let criteriaList = []
             for (let key in query) {
                 let value = query[key]
-                if (entityMeta.fields[key]) criteriaList.push({field: key, operator: "==", value: value})
+                if (entityMeta.fields[key]) criteriaList.push({
+                    field: key,
+                    operator: "==",
+                    value: value
+                })
             }
 
-            criteria = criteriaList.length ? {__type: 'relation', relation: 'and', items: criteriaList} : null
+            criteria = criteriaList.length ? {
+                __type: 'relation',
+                relation: 'and',
+                items: criteriaList
+            } : null
         }
 
         if (criteria) {
@@ -280,10 +317,19 @@ exports.parseListQuery = function (entityMeta, query) {
     } else {
         let sortBy = query._sortBy || '_createdOn'
         let sortOrder = query._sortOrder === 'asc' ? 1 : -1
-        sort = {[sortBy]: sortOrder}
+        sort = {
+            [sortBy]: sortOrder
+        }
     }
 
-    return {repo: query._repo, criteria, includedFields, sort, pageNo, pageSize}
+    return {
+        repo: query._repo,
+        criteria,
+        includedFields,
+        sort,
+        pageNo,
+        pageSize
+    }
 }
 
 exports.aSaveFilters = async function (ctx) {
@@ -294,12 +340,16 @@ exports.aSaveFilters = async function (ctx) {
 
     let instance = Meta.parseEntity(req, entityMeta)
 
-    let criteria = {name: instance.name, entityName: instance.entityName}
+    let criteria = { name: instance.name, entityName: instance.entityName }
     let includedFields = ['_id', '_version']
 
-    let lf = await EntityService.aFindOneByCriteria({}, 'F_ListFilters', criteria, {includedFields})
+    let lf = await EntityService.aFindOneByCriteria({}, 'F_ListFilters',
+        criteria, { includedFields })
     if (lf)
-        await EntityService.aUpdateOneByCriteria({}, 'F_ListFilters', {_id: lf._id, _version: lf._version}, instance)
+        await EntityService.aUpdateOneByCriteria({}, 'F_ListFilters', {
+            _id: lf._id,
+            _version: lf._version
+        }, instance)
     else
         await EntityService.aCreate({}, 'F_ListFilters', instance)
 
@@ -310,7 +360,10 @@ exports.aRemoveFilters = async function (ctx) {
     let query = ctx.query
     if (!(query && query.name && query.entityName)) return ctx.status = 400
 
-    await EntityService.aRemoveManyByCriteria({}, 'F_ListFilters', {name: query.name, entityName: query.entityName})
+    await EntityService.aRemoveManyByCriteria({}, 'F_ListFilters', {
+        name: query.name,
+        entityName: query.entityName
+    })
 
     ctx.status = 204
 }
@@ -326,7 +379,9 @@ exports.removeNotShownFields = function (entityMeta, user, ...entities) {
         let fieldMeta = fields[fieldName]
         if (fieldMeta.type === 'Password')
             removedFieldNames.push(fieldName)
-        else if (fieldMeta.notShow && !Util.isUserOrRoleHasFieldAction(user, entityMeta.name, fieldName, 'show')) {
+        else if (fieldMeta.notShow &&
+            !Util.isUserOrRoleHasFieldAction(user, entityMeta.name,
+                fieldName, 'show')) {
             removedFieldNames.push(fieldName)
         }
     }
@@ -348,7 +403,9 @@ exports.removeNoCreateFields = function (entityMeta, user, entity) {
     let removedFieldNames = []
     for (let fieldName in fields) {
         let fieldMeta = fields[fieldName]
-        if (fieldMeta.noCreate && !Util.isUserOrRoleHasFieldAction(user, entityMeta.name, fieldName, 'create')) {
+        if (fieldMeta.noCreate &&
+            !Util.isUserOrRoleHasFieldAction(user, entityMeta.name, fieldName,
+                'create')) {
             removedFieldNames.push(fieldName)
         }
     }
@@ -367,8 +424,9 @@ exports.removeNoEditFields = function (entityMeta, user, entity) {
     let removedFieldNames = []
     for (let fieldName in fields) {
         let fieldMeta = fields[fieldName]
-        if ((fieldMeta.noEdit || fieldMeta.editReadonly)
-            && !Util.isUserOrRoleHasFieldAction(user, entityMeta.name, fieldName, 'edit')) {
+        if ((fieldMeta.noEdit || fieldMeta.editReadonly) &&
+            !Util.isUserOrRoleHasFieldAction(user, entityMeta.name, fieldName,
+                'edit')) {
             removedFieldNames.push(fieldName)
         }
     }

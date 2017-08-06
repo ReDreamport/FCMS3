@@ -3,7 +3,7 @@ const Promise = require('bluebird')
 const xml2js = require("xml2js")
 const ObjectId = require('mongodb').ObjectId
 
-const xmlBuilder = new xml2js.Builder({rootName: 'xml', headless: true})
+const xmlBuilder = new xml2js.Builder({ rootName: 'xml', headless: true })
 const parseXMLString = Promise.promisify(xml2js.parseString.bind(xml2js))
 
 exports.objectToKeyValuePairString = function (obj) {
@@ -127,16 +127,20 @@ exports.inObjectIds = function (targetId, ids) {
 exports.addEqualsConditionToListCriteria = function (query, field, value) {
     if (query.criteria) {
         let criteria = query.criteria
-        let item = {field, value, operator: '=='}
+        let item = { field, value, operator: '==' }
         if (criteria.type === 'relation')
             if (criteria.relation === 'and')
                 query.criteria.items.push(item)
             else if (criteria.relation === 'or')
-                query.criteria = {__type: 'relation', relation: 'and', items: [criteria, item]}
+                query.criteria = { __type: 'relation',
+                    relation: 'and',
+                    items: [criteria, item] }
             else
-                query.criteria = {__type: 'relation', relation: 'and', items: [criteria, item]}
+                query.criteria = { __type: 'relation',
+                    relation: 'and',
+                    items: [criteria, item] }
     } else {
-        query.criteria = {"#{field}": value}
+        query.criteria = { "#{field}": value }
     }
 }
 
@@ -146,13 +150,13 @@ exports.jsObjectToTypedJSON = function (jsObject) {
 
     function addType(value) {
         if (_.isDate(value))
-            return {_type: 'Date', _value: value.getTime()}
+            return { _type: 'Date', _value: value.getTime() }
         else if (value instanceof ObjectId)
-            return {_type: 'ObjectId', _value: value.toString()}
+            return { _type: 'ObjectId', _value: value.toString() }
         else if (_.isObject(value))
-            return {_type: 'json', _value: exports.jsObjectToTypedJSON(value)}
+            return { _type: 'json', _value: exports.jsObjectToTypedJSON(value) }
         else
-            return {_type: '', _value: value}
+            return { _type: '', _value: value }
     }
 
     if (_.isArray(jsObject)) {
@@ -173,14 +177,14 @@ exports.typedJSONToJsObject = function (jsonObject) {
 
     function removeType(value) {
         switch (value._type) {
-        case 'Date' :
-            return new Date(value._value)
-        case 'ObjectId' :
-            return new ObjectId(value._value)
-        case 'json' :
-            return exports.typedJSONToJsObject(value._value)
-        default:
-            return value._value
+            case 'Date' :
+                return new Date(value._value)
+            case 'ObjectId' :
+                return new ObjectId(value._value)
+            case 'json' :
+                return exports.typedJSONToJsObject(value._value)
+            default:
+                return value._value
         }
     }
 
@@ -217,14 +221,17 @@ exports.isUserHasFieldAction = function (user, entityName, fieldName, action) {
     return aclFieldForEntityField[action]
 }
 
-exports.isUserOrRoleHasFieldAction = function (user, entityName, fieldName, action) {
+exports.isUserOrRoleHasFieldAction = function (user, entityName, fieldName,
+    action) {
     if (!user) return false
-    if (exports.isUserHasFieldAction(user, entityName, fieldName, action)) return true
+    if (exports.isUserHasFieldAction(user, entityName, fieldName, action))
+        return true
     if (user.roles)
         for (let roleName in user.roles) {
             if (user.roles.hasOwnProperty(roleName)) continue
             let role = user.roles[roleName]
-            if (exports.isUserHasFieldAction(role, entityName, fieldName, action)) return true
+            if (exports.isUserHasFieldAction(role, entityName, fieldName,
+                action)) return true
         }
 
     return false

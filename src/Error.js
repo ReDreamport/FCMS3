@@ -46,7 +46,7 @@ class MyError extends Error {
     }
 
     describe() {
-        return {code: this.code, message: this.message}
+        return { code: this.code, message: this.message }
     }
 }
 

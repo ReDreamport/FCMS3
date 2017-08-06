@@ -10,7 +10,8 @@ exports.imageDefaultMaxSize = 2 * 1024 * 1024
 exports.sessionExpireAtServer = 1000 * 60 * 60 * 24 * 15 //  15 day
 exports.usernameFields = ['username']
 
-exports.mongoDatabases =  [{name: "main", url: 'mongodb://localhost:27017/demo'}]
+exports.mongoDatabases = [
+    { name: "main", url: 'mongodb://localhost:27017/demo' }]
 
 exports.mysql = null
 

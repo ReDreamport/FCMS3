@@ -11,14 +11,14 @@ function checkPasswordFormat(password, format) {
 exports.checkPasswordFormat = checkPasswordFormat
 
 exports.clearUserSessionCookies = function (ctx) {
-    ctx.cookies.set('UserId', null, {signed: true, httpOnly: true})
-    ctx.cookies.set('UserToken', null, {signed: true, httpOnly: true})
+    ctx.cookies.set('UserId', null, { signed: true, httpOnly: true })
+    ctx.cookies.set('UserToken', null, { signed: true, httpOnly: true })
 }
 
 exports.aPing = async function (ctx) {
     let user = ctx.state.user
     if (user) {
-        let userToFront = {userId: user._id, admin: user.admin, acl: user.acl}
+        let userToFront = { userId: user._id, admin: user.admin, acl: user.acl }
         userToFront.roles = {}
         if (user.roles) {
             for (let roleId of user.roles) {
@@ -38,10 +38,12 @@ exports.aSignIn = async function (ctx) {
     if (!(req.username && req.password)) return ctx.status = 400
 
     let session = await UserService.aSignIn(req.username, req.password)
-    ctx.body = {userId: session.userId}
+    ctx.body = { userId: session.userId }
 
-    ctx.cookies.set('UserId', session.userId, {signed: true, httpOnly: true})
-    ctx.cookies.set('UserToken', session.userToken, {signed: true, httpOnly: true})
+    ctx.cookies.set('UserId', session.userId,
+        { signed: true, httpOnly: true })
+    ctx.cookies.set('UserToken', session.userToken,
+        { signed: true, httpOnly: true })
 }
 
 // 登出接口
@@ -61,7 +63,8 @@ exports.aChangePassword = async function (ctx) {
     if (!checkPasswordFormat(req.newPassword, Config.passwordFormat))
         throw new Error.UserError('BadPasswordFormat')
 
-    await UserService.aChangePassword(ctx.state.user._id, req.oldPassword, req.newPassword)
+    await UserService.aChangePassword(ctx.state.user._id,
+        req.oldPassword, req.newPassword)
 
     // 清cookies
     exports.clearUserSessionCookies(this)

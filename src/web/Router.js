@@ -22,7 +22,8 @@ class RouteRuleRegisters {
         this.errorCatcher = errorCatcher
         if (!urlPrefix) throw new Error('urlPrefix cannot be empty')
         // 去掉后缀的斜线
-        if (urlPrefix[urlPrefix.length - 1] === '/') urlPrefix = urlPrefix.substring(0, urlPrefix.length - 1)
+        if (urlPrefix[urlPrefix.length - 1] === '/')
+            urlPrefix = urlPrefix.substring(0, urlPrefix.length - 1)
         this.urlPrefix = urlPrefix
     }
 
@@ -40,7 +41,7 @@ class RouteRuleRegisters {
         addRouteRules(method, url, info, ...handlers)
     }
 
-    get (url, info, ...handlers) {
+    get(url, info, ...handlers) {
         this.add('get', url, info, ...handlers)
     }
 
@@ -85,7 +86,8 @@ exports.refresh = function () {
             let routeWeight = 0
             for (let index = 0; index < partsLength; index++) {
                 let part = parts[index]
-                let mOfIndex = Util.setIfNone(mOfLength, index, {terms: {}, variable: []})
+                let mOfIndex = Util.setIfNone(mOfLength, index,
+                    { terms: {}, variable: [] })
 
                 if (part[0] === ':') {
                     let name = part.slice(1)
@@ -118,15 +120,14 @@ exports.aParseRoute = async function (ctx, next) {
         ctx.route = route
         await next()
     } else {
-        Log.debug('fail to match route,', {method: ctx.request.method, path: path})
+        Log.debug('Fail to match route',
+            { method: ctx.request.method, path: path })
         ctx.status = 404
     }
 }
 
 // 执行路由的处理器
 exports.aHandleRoute = async function (ctx, next) {
-    // 可以 yield 一个 Generator 貌似是 co 库负责的
-    // https://github.com/koajs/koa/blob/master/docs/guide.md#middleware-best-practices
     await ctx.route.handler(ctx, next)
 }
 
@@ -159,14 +160,15 @@ function match(method, path, params) {
         for (let index = 0; index < partsLength; index++) {
             let part = parts[index]
             let mOfIndex = mOfLength[index]
-            if (!mOfIndex) return null  // 不匹配
+            if (!mOfIndex) return null // 不匹配
             if (index === 0) {
                 // 初始集合
                 possibleRouteUrl = collectRouteUrls(mOfIndex, part)
             } else {
                 let newPossibleRouteUrl = collectRouteUrls(mOfIndex, part)
                 // 取交集
-                for (let u in possibleRouteUrl) !newPossibleRouteUrl[u] && delete possibleRouteUrl[u]
+                for (let u in possibleRouteUrl)
+                    !newPossibleRouteUrl[u] && delete possibleRouteUrl[u]
             }
             if (!_.size(possibleRouteUrl)) return null
         }
@@ -195,10 +197,14 @@ function match(method, path, params) {
 //     exports.addRouteRules('get', "/home", {action: "home"}, (next)-> true)
 //     exports.addRouteRules('get', "/meta", {action: "meta"}, (next)-> true)
 //     exports.addRouteRules('post', "/meta", {action: "meta"}, (next)-> true)
-//     exports.addRouteRules('put', "/meta/:name", {action: "meta"}, (next)-> true)
-//     exports.addRouteRules('put', "/meta/_blank", {action: "meta"}, (next)-> true)
-//     exports.addRouteRules('put', "/meta/:name/fields", {action: "meta"}, (next)-> true)
-//     exports.addRouteRules('get', "/entity/:name/:id", {action: "entity"}, (next)-> true)
+//     exports.addRouteRules('put', "/meta/:name", {action: "meta"},
+//         (next)-> true)
+//     exports.addRouteRules('put', "/meta/_blank", {action: "meta"},
+//         (next)-> true)
+//     exports.addRouteRules('put', "/meta/:name/fields", {action: "meta"},
+//         (next)-> true)
+//     exports.addRouteRules('get', "/entity/:name/:id", {action: "entity"},
+//         (next)-> true)
 //     exports.refresh()
 //
 //     #log.debug JSON.stringify(rootMapping, null, 4)
@@ -218,5 +224,5 @@ function splitPath(aPath) {
 function addRouteRules(method, url, info, ...handlers) {
     let key = method + url
     let handler = handlers.length === 1 ? handlers[0] : compose(handlers)
-    routes[key] = {method, url, info, handler, indexToVariable: {}}
+    routes[key] = { method, url, info, handler, indexToVariable: {} }
 }

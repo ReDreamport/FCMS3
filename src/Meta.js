@@ -8,18 +8,20 @@ const Log = require('./Log')
 const Mongo = require('./storage/Mongo')
 const Redis = require('./storage/Redis')
 
-exports.DB = {mongo: 'mongodb', mysql: 'mysql', none: 'none'}
+exports.DB = { mongo: 'mongodb', mysql: 'mysql', none: 'none' }
 
 exports.ObjectIdStringLength = 24
 
 // 字段逻辑类型（应用层类型）
-exports.FieldDataTypes = ["ObjectId", "String", "Password", "Boolean", "Int", "Float",
+exports.FieldDataTypes = ["ObjectId", "String", "Password", "Boolean",
+    "Int", "Float",
     "Date", "Time", "DateTime",
     "Image", "File",
     "Component", "Reference", "Object"]
 
 // MongoDB存储类型
-const MongoPersistTypes = ["ObjectId", "String", "Boolean", "Number", "Date", 'Document']
+const MongoPersistTypes = ["ObjectId", "String", "Boolean", "Number",
+    "Date", 'Document']
 
 const MySQLPersistTypes = ["varchar", "char", "blob", "text",
     "int", "bit", "tinyint", "bigint", "decimal", "float", "double",
@@ -27,13 +29,16 @@ const MySQLPersistTypes = ["varchar", "char", "blob", "text",
 
 exports.AllPersistTypes = MongoPersistTypes.concat(MySQLPersistTypes)
 
-exports.InputTypes = ["Text", "Password", "TextArea", "RichText", "Select", "Check", "Int", "Float", "CheckList",
-    "Date", "Time", "DateTime", "File", "Image", "InlineComponent", "PopupComponent", "TabledComponent", "Reference"]
+exports.InputTypes = ["Text", "Password", "TextArea", "RichText",
+    "Select", "Check", "Int", "Float", "CheckList",
+    "Date", "Time", "DateTime", "File", "Image",
+    "InlineComponent", "PopupComponent", "TabledComponent", "Reference"]
 
 exports.actions = {}
 
 function isDateOrTimeType(fieldType) {
-    return fieldType === "Date" || fieldType === "Time" || fieldType === "DateTime"
+    return fieldType === "Date" || fieldType === "Time"
+        || fieldType === "DateTime"
 }
 
 let entities = null
@@ -56,7 +61,7 @@ exports.getEntities = () => entities
 
 // 前端使用的元数据
 exports.getMetaForFront = () => {
-    return {entities: entities}
+    return { entities: entities }
 }
 
 exports.aLoad = async function () {
@@ -85,7 +90,8 @@ exports.aSaveEntityMeta = async function (entityName, entityMeta) {
     let db = await Mongo.stores.main.aDatabase()
     let c = db.collection('F_EntityMeta')
 
-    await c.updateOne({name: entityName}, {$set: entityMeta, $inc: {_version: 1}}, {upsert: true})
+    await c.updateOne({ name: entityName },
+        { $set: entityMeta, $inc: { _version: 1 } }, { upsert: true })
 
     entities[entityName] = entityMeta
 
@@ -96,7 +102,7 @@ exports.gRemoveEntityMeta = async function (entityName) {
     "use strict"
     let db = await Mongo.stores.main.aDatabase()
     let c = db.collection('F_EntityMeta')
-    await c.removeOne({name: entityName})
+    await c.removeOne({ name: entityName })
 
     delete entities[entityName]
 
@@ -134,7 +140,7 @@ exports.parseListQueryValue = function (criteria, entityMeta) {
 
 // 将 HTTP 输入的字段值规范化，value 可以是数组
 exports.parseFieldValue = function (value, fieldMeta) {
-    if (!fieldMeta) return undefined  // TODO 异常处理
+    if (!fieldMeta) return undefined // TODO 异常处理
     // null / undefined 语义不同
     if (_.isNil(value)) return value // null/undefined 原样返回
 
@@ -152,7 +158,8 @@ exports.parseFieldValue = function (value, fieldMeta) {
     } else if (fieldMeta.type === "Reference") {
         let refEntityMeta = exports.getEntityMeta(fieldMeta.refEntity)
         if (!refEntityMeta)
-            throw new Error `No ref entity [${fieldMeta.refEntity}]. Field ${fieldMeta.name}.`
+            throw new Error `No ref entity [${fieldMeta.refEntity}]. `
+                + `Field ${fieldMeta.name}.`
 
         let idMeta = refEntityMeta.fields._id
         return exports.parseFieldValue(value, idMeta)
@@ -174,7 +181,8 @@ exports.parseFieldValue = function (value, fieldMeta) {
     else if (fieldMeta.type === "Component") {
         let refEntityMeta = exports.getEntityMeta(fieldMeta.refEntity)
         if (!refEntityMeta)
-            throw new Error `No ref entity [${fieldMeta.refEntity}]. Field ${fieldMeta.name}.`
+            throw new Error `No ref entity [${fieldMeta.refEntity}].`
+                + `Field ${fieldMeta.name}.`
 
         if (_.isArray(value))
             return _.map(value, (i) => exports.parseEntity(i, refEntityMeta))
@@ -223,10 +231,12 @@ exports.formatFieldToHttp = function (fieldValue, fieldMeta) {
     else if (fieldMeta.type === "Component") {
         let refEntityMeta = exports.getEntityMeta(fieldMeta.refEntity)
         if (!refEntityMeta)
-            throw new Error `No ref entity [${fieldMeta.refEntity}]. Field ${fieldMeta.name}`
+            throw new Error `No ref entity [${fieldMeta.refEntity}]. `
+                + `Field ${fieldMeta.name}`
 
         if (fieldMeta.multiple)
-            return _.map(fieldValue, (i) => exports.formatEntityToHttp(i, refEntityMeta))
+            return _.map(fieldValue, (i) =>
+                exports.formatEntityToHttp(i, refEntityMeta))
         else
             return exports.formatEntityToHttp(fieldValue, refEntityMeta)
     } else if (fieldMeta.type === "Reference")
@@ -272,7 +282,7 @@ exports.imagePathsToImageObjects = function (paths, thumbnailFilled) {
     if (!(paths && paths.length)) return paths
 
     return _.map(paths, (path) => {
-        let o = {path: path}
+        let o = { path: path }
         if (thumbnailFilled) o.thumbnail = path
         return o
     })
