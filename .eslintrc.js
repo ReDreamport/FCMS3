@@ -84,6 +84,7 @@ module.exports = {
                 "named": "never",
                 "asyncArrow": "always"
             }
-        ]
+        ],
+        "space-infix-ops": ["error", {"int32Hint": false}]
     }
 }

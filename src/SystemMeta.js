@@ -1,5 +1,6 @@
 const _ = require('lodash')
 
+// const Log = require('./Log')
 const Meta = require('./Meta')
 const Config = require('./Config')
 
@@ -919,7 +920,9 @@ const SystemEntities = {
     }
 }
 
-exports.init = function () {
+exports.init = function (extraEntities) {
+    if (extraEntities) mergeEntities(extraEntities)
+
     for (let entityName in SystemEntities) {
         let entityMeta = SystemEntities[entityName]
         if (!entityMeta.noPatchSystemFields) patchSystemFields(entityMeta)
@@ -933,4 +936,38 @@ exports.init = function () {
     // TODO mysql databases
 
     exports.SystemEntities = SystemEntities
+}
+
+function mergeEntities(extraEntities) {
+    // Log.debug("extraEntities", extraEntities)
+    for (let entityName in extraEntities) {
+        let extraEntity = extraEntities[entityName]
+        let systemEntity = SystemEntities[entityName]
+        if (systemEntity) {
+            for (let itemName in extraEntity) {
+                let itemValue = extraEntity[itemName]
+                if (itemName === 'fields') {
+                    let systemFields = systemEntity.fields
+                    for (let fieldName in itemValue) {
+                        let extraFieldMeta = itemValue[fieldName]
+                        let systemFieldMeta = systemFields[fieldName]
+                        if (systemFieldMeta) {
+                            Object.assign(systemFieldMeta, extraFieldMeta)
+                        } else {
+                            // Log.debug('add field', extraFieldMeta)
+                            systemFields[fieldName] = extraFieldMeta
+                        }
+                    }
+                } else if (itemName === 'mongoIndexes') {
+                    // 索引采用追加的方式
+                    systemEntity.mongoIndexes = systemEntity.mongoIndexes || []
+                    systemEntity.mongoIndexes.splice(0, 0, ...itemValue)
+                } else {
+                    systemEntity[itemName] = itemValue
+                }
+            }
+        } else {
+            SystemEntities[entityName] = extraEntity
+        }
+    }
 }

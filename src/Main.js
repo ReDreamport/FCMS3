@@ -12,17 +12,17 @@ const WebServer = require('./web/WebServer')
 
 let webStarted = false
 
-exports.start = function (appConfig, addRouteRules) {
+exports.start = function (appConfig, addRouteRules, extraEntities) {
     process.on('SIGINT', onProcessTerm)
     process.on('SIGTERM', onProcessTerm)
 
-    return aStart(appConfig, addRouteRules).catch(function (e) {
+    return aStart(appConfig, addRouteRules, extraEntities).catch(function (e) {
         Log.system.error(e, 'Fail to start')
         stop()
     })
 }
 
-async function aStart(appConfig, addRouteRules) {
+async function aStart(appConfig, addRouteRules, extraEntities) {
     "use strict"
     Object.assign(Config, appConfig)
     Log.config(Config)
@@ -38,7 +38,7 @@ async function aStart(appConfig, addRouteRules) {
 
     // 元数据
     const Meta = require('./Meta')
-    await Meta.aLoad()
+    await Meta.aLoad(extraEntities)
 
     // 初始化数据库结构、索引
     const MongoIndex = require('./storage/MongoIndex')

@@ -64,9 +64,9 @@ exports.getMetaForFront = () => {
     return { entities: entities }
 }
 
-exports.aLoad = async function () {
+exports.aLoad = async function (extraEntities) {
     const SystemMeta = require('./SystemMeta')
-    SystemMeta.init()
+    SystemMeta.init(extraEntities)
 
     let db = await Mongo.stores.main.aDatabase()
 
