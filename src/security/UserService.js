@@ -158,7 +158,7 @@ exports.aSignInSuccessfully = async function (origin, user) {
     session.userToken = chance.string({ length: 24 })
     session.expireAt = Date.now() + Config.sessionExpireAtServer
 
-    await exports.aSignOut(user._id) // 先退出
+    await exports.aSignOut(origin, user._id) // 先退出
     await EntityService.aCreate({}, 'F_UserSession', session)
 
     return session

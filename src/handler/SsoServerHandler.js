@@ -1,13 +1,11 @@
 const chance = new require('chance')()
 const { URL } = require('url')
-const rp = require('request-promise-native')
 
 const Meta = require('../Meta')
 const Log = require('../Log')
 const Config = require('../Config')
 const Error = require('../Error')
 const EntityService = require('../service/EntityService')
-const UserService = require('../security/UserService')
 
 // SSO 客户端请求该接口
 // 如果 SSO 已登录，则产生一个 TOKEN 回调客户端校验 TOKEN 的接口
@@ -45,6 +43,7 @@ exports.aAuth = async function (ctx) {
     ctx.redirect(acceptTokenUrl)
 }
 
+// SSO 前端页面请求登录
 exports.aSignIn = async function (ctx) {
     let req = ctx.request.body
     if (!(req.username && req.password)) return ctx.status = 400
@@ -59,7 +58,7 @@ exports.aSignIn = async function (ctx) {
         { signed: true, httpOnly: true })
 }
 
-// SSO 校验客户端接受到的 TOKEN 的真实性
+// 校验 SSO 客户端接受到的 TOKEN 的真实性
 exports.aValidateToken = async function (ctx) {
     let req = ctx.request.body
     if (!req) return ctx.status = 400
@@ -85,49 +84,6 @@ exports.aValidateToken = async function (ctx) {
         throw new Error.UserError("TokenExpired", "Token Expired")
 
     ctx.body = { userId: ct.userId }
-}
-
-// SSO 客户端接收 SSO 服务器的 TOKEN 回调
-exports.aAcceptToken = async function (ctx) {
-    let token = ctx.query.token
-    let origin = ctx.request.origin
-
-    let originConfig = Config.originConfigs[origin]
-    if (!originConfig) throw new Error.UserError("BadClient", "Bad Client")
-
-    let callback = ctx.query.callback
-    callback = callback ? decodeURIComponent(callback)
-        : originConfig.defaultCallbackUrl
-
-    let options = {
-        method: 'POST',
-        uri: originConfig.validateSsoTokenUrl,
-        body: { key: originConfig.ssoKey, token, origin },
-        json: true
-    }
-    try {
-        let res = await rp(options)
-        Log.debug("res", res)
-        if (!res)
-            throw new Error.SystemError("ValidateTokenFail",
-                "Failed to Validate Token")
-
-        let userId = res.userId
-        let user = await EntityService.aFindOneById({}, 'F_User', userId)
-
-        let session = await UserService.aSignInSuccessfully(origin, user)
-
-        // TODO 把设置本机登录 Cookies 的放在一处
-        ctx.cookies.set('UserId', session.userId,
-            { signed: true, httpOnly: true })
-        ctx.cookies.set('UserToken', session.userToken,
-            { signed: true, httpOnly: true })
-
-        ctx.redirect(callback)
-    } catch (e) {
-        Log.system.error(e, "Failed to validate SSO token")
-        throw e
-    }
 }
 
 async function aValidSsoSession(userId, userToken) {

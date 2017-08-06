@@ -53,13 +53,14 @@ exports.addCommonRouteRules = function (RouteRuleRegisters) {
     //     UserHandler.aChangeEmail)
 
     if (Config.ssoServer) {
-        let SsoHandler = require('../handler/SsoHandler')
+        let SsoServerHandler = require('../handler/SsoServerHandler')
 
-        rrr.get('/sso/auth', {}, SsoHandler.aAuth)
-        rrr.post('/sso/sign-in', {}, SsoHandler.aSignIn)
-        rrr.post('/sso/validate-token', {}, SsoHandler.aValidateToken)
+        rrr.get('/sso/auth', {}, SsoServerHandler.aAuth)
+        rrr.post('/sso/sign-in', {}, SsoServerHandler.aSignIn)
+        rrr.post('/sso/validate-token', {}, SsoServerHandler.aValidateToken)
 
-        rrr.get('/sso/client/token', {}, SsoHandler.aAcceptToken)
+        let SsoClientHandler = require('../handler/SsoClientHandler')
+        rrr.get('/sso/client/token', {}, SsoClientHandler.aAcceptToken)
     }
 
     // ======================================
