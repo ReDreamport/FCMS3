@@ -72,13 +72,15 @@ async function aCatchError(ctx, next) {
             await next()
         } catch (e) {
             if (e instanceof Error.Error401) {
-                ctx.status = 401
+                let originConfig = Config.originConfigs[ctx.request.origin]
+                // console.log(originConfig, originConfig)
+                let href = encodeURIComponent(ctx.request.href)
+                let signInUrl = originConfig.signInUrl + '?callback=' + href
                 if (routeInfo.isPage) {
-                    let len = Config.urlPrefix.length + 1
-                    let url = ctx.request.originalUrl.substring(len)
-                    ctx.redirect('sign-in?callback=' + encodeURIComponent(url))
+                    ctx.redirect(signInUrl)
                 } else {
-                    ctx.body = e.describe()
+                    ctx.status = 401
+                    ctx.body = { signInUrl }
                 }
             } else if (e instanceof Error.Error403) {
                 ctx.status = 403

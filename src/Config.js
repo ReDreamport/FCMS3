@@ -23,8 +23,6 @@ exports.emailOrg = ''
 
 exports.fileDir = ''
 
-exports.urlPrefix = null
-
 exports.errorCatcher = null
 
 exports.fileDownloadPrefix = '/r/'
@@ -37,3 +35,5 @@ exports.asSSOClient = false
 
 exports.cluster = false
 exports.workerNum = 2
+
+exports.ssoServer = null

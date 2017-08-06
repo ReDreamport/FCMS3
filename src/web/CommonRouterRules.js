@@ -1,4 +1,5 @@
 const Meta = require('../Meta')
+const Config = require('../Config.js')
 
 const actions = {
     ReadMeta: '读取元数据',
@@ -16,7 +17,8 @@ const actions = {
 
 Object.assign(Meta.actions, actions)
 
-exports.addCommonRouteRules = function (rrr) {
+exports.addCommonRouteRules = function (RouteRuleRegisters) {
+    const rrr = new RouteRuleRegisters('/c', Config.errorCatcher)
     // ======================================
     // 元数据管理
     // ======================================
@@ -39,16 +41,23 @@ exports.addCommonRouteRules = function (rrr) {
 
     let UserHandler = require('../handler/UserHandler')
 
-    rrr.get('/api/ping', { auth: true }, UserHandler.aPing)
-    rrr.post('/api/sign-in', {}, UserHandler.aSignIn)
-    rrr.post('/api/sign-out', { auth: true }, UserHandler.aSignOut)
-    rrr.post('/api/change-password', { auth: true },
+    rrr.get('/ping', { auth: true }, UserHandler.aPing)
+    rrr.post('/sign-in', {}, UserHandler.aSignIn)
+    rrr.post('/sign-out', { auth: true }, UserHandler.aSignOut)
+    rrr.post('/change-password', { auth: true },
         UserHandler.aChangePassword)
-    // rrr.post('/api/reset-password', {}, UserHandler.aResetPassword)
-    // rrr.post('/api/change-phone', {action: 'ChangePhone'},
+    // rrr.post('/reset-password', {}, UserHandler.aResetPassword)
+    // rrr.post('/change-phone', {action: 'ChangePhone'},
     //     UserHandler.aChangePhone)
-    // rrr.post('/api/change-email', {action: 'ChangeEmail'},
+    // rrr.post('/change-email', {action: 'ChangeEmail'},
     //     UserHandler.aChangeEmail)
+
+    if (Config.ssoServer) {
+        let SsoHandler = require('../handler/SsoHandler')
+
+        rrr.get('/sso/auth', {}, SsoHandler.aAuth)
+        rrr.post('/sso/validate-token', {}, SsoHandler.aValidateToken)
+    }
 
     // ======================================
     // 安全
@@ -56,9 +65,9 @@ exports.addCommonRouteRules = function (rrr) {
     // let SecurityCodeHandler = require('../handler/SecurityCodeHandler')
 
     // 发送注册验证码到手机和邮箱
-    // rrr.post('/api/security-code/phone/:phone', {},
+    // rrr.post('/security-code/phone/:phone', {},
     //     SecurityCodeHandler.aSendSignUpCodeToPhone)
-    // rrr.post('/api/security-code/email/:email', {},
+    // rrr.post('/security-code/email/:email', {},
     //     SecurityCodeHandler.aSendSignUpCodeToEmail)
 
     // let CaptchaHandler = require('../handler/CaptchaHandler')

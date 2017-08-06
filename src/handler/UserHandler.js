@@ -37,7 +37,8 @@ exports.aSignIn = async function (ctx) {
     let req = ctx.request.body
     if (!(req.username && req.password)) return ctx.status = 400
 
-    let session = await UserService.aSignIn(req.username, req.password)
+    let origin = ctx.request.origin
+    let session = await UserService.aSignIn(origin, req.username, req.password)
     ctx.body = { userId: session.userId }
 
     ctx.cookies.set('UserId', session.userId,
@@ -48,7 +49,7 @@ exports.aSignIn = async function (ctx) {
 
 // 登出接口
 exports.aSignOut = async function (ctx) {
-    await UserService.aSignOut(ctx.state.userId)
+    await UserService.aSignOut(ctx.request.origin, ctx.state.userId)
 
     // 清cookies
     exports.clearUserSessionCookies(this)

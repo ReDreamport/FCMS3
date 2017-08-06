@@ -105,9 +105,9 @@ exports.aGetAnonymousRole = async function () {
     return role
 }
 
-exports.aAuthToken = async function (userId, userToken) {
+exports.aAuthToken = async function (origin, userId, userToken) {
     let session = await EntityService.aFindOneByCriteria({},
-        'F_UserSession', { userId })
+        'F_UserSession', { origin, userId })
     if (!session) return false
 
     if (session.userToken !== userToken) {
@@ -127,7 +127,7 @@ exports.aAuthToken = async function (userId, userToken) {
 
 // 登录
 // TODO 思考：如果用户之前登录此子应用的 session 未过期，是返回之前的 session 还是替换 session
-exports.aSignIn = async function (username, password) {
+exports.aSignIn = async function (origin, username, password) {
     if (!password) throw new Error.UserError("PasswordNotMatch")
 
     let usernameFields = Config.usernameFields
@@ -147,8 +147,9 @@ exports.aSignIn = async function (username, password) {
         throw new Error.UserError("PasswordNotMatch")
 
     let session = {}
+    session.origin = origin
     session.userId = user._id
-    session.userToken = chance.string({ length: 20 })
+    session.userToken = chance.string({ length: 24 })
     session.expireAt = Date.now() + Config.sessionExpireAtServer
 
     await exports.aSignOut(user._id) // 先退出
@@ -158,8 +159,8 @@ exports.aSignIn = async function (username, password) {
 }
 
 // 登出
-exports.aSignOut = async function (userId) {
-    let criteria = { userId: userId }
+exports.aSignOut = async function (origin, userId) {
+    let criteria = { userId, origin }
     await EntityService.aRemoveManyByCriteria({}, 'F_UserSession', criteria)
 }
 
