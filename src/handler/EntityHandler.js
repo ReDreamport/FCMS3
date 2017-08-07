@@ -54,12 +54,13 @@ exports._aCreateEntity = async function (ctx, entityName, instance) {
 }
 
 exports.aUpdateEntityById = async function (ctx) {
-    await exports._aUpdateEntityById (ctx, ctx.params.id, ctx.request.body)
+    let entityName = ctx.params.entityName
+    await exports._aUpdateEntityById (ctx,
+        entityName, ctx.params.id, ctx.request.body)
     ctx.status = 204
 }
 
-exports._aUpdateEntityById = async function (ctx, _id, instance) {
-    let entityName = ctx.params.entityName
+exports._aUpdateEntityById = async function (ctx, entityName, _id, instance) {
     let entityMeta = Meta.getEntityMeta(entityName)
 
     if (!entityMeta) throw new Errors.UserError('NoSuchEntity')
