@@ -74,7 +74,7 @@ async function aCatchError(ctx, next) {
             if (e instanceof Errors.Error401) {
                 let originConfig = Config.originConfigs[ctx.request.origin]
                 // console.log(originConfig, originConfig)
-                let signInUrl = originConfig.signInUrl
+                let signInUrl = originConfig.ssoServer + '/sso/auth'
                 if (routeInfo.isPage) {
                     ctx.redirect(signInUrl)
                 } else {

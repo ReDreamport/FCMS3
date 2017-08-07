@@ -86,6 +86,33 @@ exports.aValidateToken = async function (ctx) {
     ctx.body = { userId: ct.userId }
 }
 
+exports.aSignOut = async function (ctx) {
+    let userId = ctx.cookies.get('SsoUserId', { signed: true })
+    let userToken = ctx.cookies.get('SsoUserToken', { signed: true })
+
+    let callback = ctx.query.callback
+    if (!callback)
+        throw new Errors.UserError("MissingCallback", "Missing Callback")
+    let encodedCallback = encodeURIComponent(callback)
+
+    let session = await aValidSsoSession(userId, userToken)
+    if (!session) {
+        ctx.status = 401
+        return
+    }
+
+    // 退出 SSO
+    await aSignOut(userId)
+
+    // 退出所有客户端
+    await EntityService.aRemoveManyByCriteria({}, 'F_UserSession',
+        { userId: userId })
+
+    let redirect = ctx.request.origin
+            + `/sso/sign-in?callback=${encodedCallback}`
+    ctx.redirect(redirect)
+}
+
 async function aValidSsoSession(userId, userToken) {
     let session = await EntityService.aFindOneByCriteria({},
         'F_SsoSession', { userId })

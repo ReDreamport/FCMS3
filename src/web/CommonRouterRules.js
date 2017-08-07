@@ -58,9 +58,11 @@ exports.addCommonRouteRules = function (RouteRuleRegisters) {
         rrr.get('/sso/auth', {}, SsoServerHandler.aAuth)
         rrr.post('/sso/sign-in', {}, SsoServerHandler.aSignIn)
         rrr.post('/sso/validate-token', {}, SsoServerHandler.aValidateToken)
+        rrr.get('/sso/sign-out', {}, SsoServerHandler.aSignOut)
 
         let SsoClientHandler = require('../handler/SsoClientHandler')
         rrr.get('/sso/client/token', {}, SsoClientHandler.aAcceptToken)
+        rrr.get('/sso/client/sign-out', {}, SsoClientHandler.aSignOut)
     }
 
     // ======================================

@@ -20,7 +20,7 @@ exports.aAcceptToken = async function (ctx) {
 
     let options = {
         method: 'POST',
-        uri: originConfig.validateSsoTokenUrl,
+        uri: originConfig.ssoServer + '/sso/validate-token',
         body: { key: originConfig.ssoKey, token, origin },
         json: true
     }
@@ -47,4 +47,18 @@ exports.aAcceptToken = async function (ctx) {
         Log.system.error(e, "Failed to validate SSO token")
         throw e
     }
+}
+
+exports.aSignOut = async function (ctx) {
+    let origin = ctx.request.origin
+
+    let originConfig = Config.originConfigs[origin]
+    if (!originConfig) throw new Errors.UserError("BadClient", "Bad Client")
+
+    let callback = ctx.query.callback
+    callback = callback ? decodeURIComponent(callback)
+        : originConfig.defaultCallbackUrl
+
+    ctx.redirect(originConfig.ssoServer + '/sso/sign-out?callback='
+        + encodeURIComponent(callback))
 }
