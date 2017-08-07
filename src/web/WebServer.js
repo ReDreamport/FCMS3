@@ -1,7 +1,7 @@
 const Promise = require('bluebird')
 
 const Log = require('../Log')
-const Error = require('../Error')
+const Errors = require('../Errors')
 const Config = require('../Config')
 
 const Extension = require('../Extension')
@@ -71,7 +71,7 @@ async function aCatchError(ctx, next) {
         try {
             await next()
         } catch (e) {
-            if (e instanceof Error.Error401) {
+            if (e instanceof Errors.Error401) {
                 let originConfig = Config.originConfigs[ctx.request.origin]
                 // console.log(originConfig, originConfig)
                 let signInUrl = originConfig.signInUrl
@@ -81,10 +81,10 @@ async function aCatchError(ctx, next) {
                     ctx.status = 401
                     ctx.body = { signInUrl }
                 }
-            } else if (e instanceof Error.Error403) {
+            } else if (e instanceof Errors.Error403) {
                 ctx.status = 403
                 ctx.body = e.describe()
-            } else if (e instanceof Error.UserError) {
+            } else if (e instanceof Errors.UserError) {
                 ctx.status = 400
                 ctx.body = e.describe()
             } else {

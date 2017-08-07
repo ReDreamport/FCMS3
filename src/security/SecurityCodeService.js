@@ -3,7 +3,7 @@ const chance = new require('chance')()
 // const request = require('request')
 // const pRequestPost = Promise.promisify(request.post.bind(request))
 
-const Error = require('../Error')
+const Errors = require('../Errors')
 const Cache = require('../cache/Cache')
 const MailService = require('./MailService')
 
@@ -12,9 +12,9 @@ exports.aCheck = async function (target, code) {
     let expectedCode = await Cache.aGetString(['securityCodes', target])
 
     if (!(expectedCode && expectedCode.code === code))
-        throw new Error.UserError("SecurityCodeNotMatch")
+        throw new Errors.UserError("SecurityCodeNotMatch")
     if (Date.now() - expectedCode.sendTime > 15 * 60 * 1000)
-        throw new Error.UserError("SecurityCodeExpired") // 过期
+        throw new Errors.UserError("SecurityCodeExpired") // 过期
 
     await Cache.aUnset(['securityCodes'], [target])
 }

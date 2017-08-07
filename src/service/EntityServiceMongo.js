@@ -1,6 +1,6 @@
 const _ = require('lodash')
 
-const Error = require('../Error')
+const Errors = require('../Errors')
 const Meta = require('../Meta')
 const Log = require('../Log')
 const Util = require('../Util')
@@ -22,7 +22,7 @@ exports.aCreate = async function (entityMeta, instance) {
     } catch (e) {
         if (!Mongo.isIndexConflictError(e)) throw e
         let { code, message } = errorToDupKeyError(e, entityMeta)
-        throw new Error.UniqueConflictError(code, message)
+        throw new Errors.UniqueConflictError(code, message)
     }
 }
 
@@ -43,7 +43,7 @@ exports.aUpdateManyByCriteria = async function (entityMeta, criteria,
     } catch (e) {
         if (!Mongo.isIndexConflictError(e)) throw e
         let { code, message } = errorToDupKeyError(e, entityMeta)
-        throw new Error.UniqueConflictError(code, message)
+        throw new Errors.UniqueConflictError(code, message)
     }
 }
 
@@ -63,10 +63,10 @@ exports.aUpdateOneByCriteria = async function (entityMeta, criteria, instance) {
     } catch (e) {
         if (!Mongo.isIndexConflictError(e)) throw e
         let { code, message } = errorToDupKeyError(e, entityMeta)
-        throw new Error.UniqueConflictError(code, message)
+        throw new Errors.UniqueConflictError(code, message)
     }
 
-    if (r.modifiedCount !== 1) throw new Error.UserError('ConcurrentUpdate')
+    if (r.modifiedCount !== 1) throw new Errors.UserError('ConcurrentUpdate')
 }
 
 exports.aRemoveManyByCriteria = async function (entityMeta, criteria) {
@@ -126,7 +126,7 @@ exports.aRecoverMany = async function (entityMeta, ids) {
     } catch (e) {
         if (!Mongo.isIndexConflictError(e)) throw e
         let { code, message } = errorToDupKeyError(e, entityMeta)
-        throw new Error.UniqueConflictError(code, message)
+        throw new Errors.UniqueConflictError(code, message)
     }
 
     await trashCollection.deleteMany({ _id: { $in: ids } })

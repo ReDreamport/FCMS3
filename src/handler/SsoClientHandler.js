@@ -2,7 +2,7 @@ const rp = require('request-promise-native')
 
 const Log = require('../Log')
 const Config = require('../Config')
-const Error = require('../Error')
+const Errors = require('../Errors')
 const EntityService = require('../service/EntityService')
 const UserService = require('../security/UserService')
 
@@ -12,7 +12,7 @@ exports.aAcceptToken = async function (ctx) {
     let origin = ctx.request.origin
 
     let originConfig = Config.originConfigs[origin]
-    if (!originConfig) throw new Error.UserError("BadClient", "Bad Client")
+    if (!originConfig) throw new Errors.UserError("BadClient", "Bad Client")
 
     let callback = ctx.query.callback
     callback = callback ? decodeURIComponent(callback)
@@ -28,7 +28,7 @@ exports.aAcceptToken = async function (ctx) {
         let res = await rp(options)
         Log.debug("res", res)
         if (!res)
-            throw new Error.SystemError("ValidateTokenFail",
+            throw new Errors.SystemError("ValidateTokenFail",
                 "Failed to Validate Token")
 
         let userId = res.userId

@@ -4,7 +4,7 @@ const { URL } = require('url')
 const Meta = require('../Meta')
 const Log = require('../Log')
 const Config = require('../Config')
-const Error = require('../Error')
+const Errors = require('../Errors')
 const EntityService = require('../service/EntityService')
 
 // SSO 客户端请求该接口
@@ -16,7 +16,7 @@ exports.aAuth = async function (ctx) {
 
     let callback = ctx.query.callback
     if (!callback)
-        throw new Error.UserError("MissingCallback", "Missing Callback")
+        throw new Errors.UserError("MissingCallback", "Missing Callback")
     let encodedCallback = encodeURIComponent(callback)
 
     let session = await aValidSsoSession(userId, userToken)
@@ -31,7 +31,7 @@ exports.aAuth = async function (ctx) {
     let callbackOrigin = callbackUrl.origin // http://www.baidu.com:80
     let clientConfig = Config.ssoServer.clients[callbackOrigin]
     if (!clientConfig)
-        throw new Error.UserError("UnkownClient",
+        throw new Errors.UserError("UnkownClient",
             "Unkown Client: " + callbackOrigin)
 
     let { acceptTokenUrl } = clientConfig
@@ -65,15 +65,15 @@ exports.aValidateToken = async function (ctx) {
 
     let clientConfig = Config.ssoServer.clients[req.origin]
     if (!clientConfig)
-        throw new Error.UserError("UnkownClient",
+        throw new Errors.UserError("UnkownClient",
             "Unkown Client: " + req.origin)
     // 校验客户端的通信密钥
     if (clientConfig.key !== req.key)
-        throw new Error.UserError("BadClientKey", "Bad Client Key")
+        throw new Errors.UserError("BadClientKey", "Bad Client Key")
 
     let ct = await EntityService.aFindOneByCriteria({},
         'F_SsoClientToken', { origin: req.origin, token: req.token })
-    if (!ct) throw new Error.UserError("BadToken", "Bad Token")
+    if (!ct) throw new Errors.UserError("BadToken", "Bad Token")
 
     // 只能用一次，检验后就删除
     await EntityService.aRemoveManyByCriteria({}, 'F_SsoClientToken',
@@ -81,7 +81,7 @@ exports.aValidateToken = async function (ctx) {
 
     // 判断是否过期
     if (Date.now() - ct._createdOn.getTime() > 10000)
-        throw new Error.UserError("TokenExpired", "Token Expired")
+        throw new Errors.UserError("TokenExpired", "Token Expired")
 
     ctx.body = { userId: ct.userId }
 }
@@ -115,7 +115,7 @@ async function aNewClientToken(origin, userId) {
 }
 
 async function aSignIn(username, password) {
-    if (!password) throw new Error.UserError("PasswordNotMatch")
+    if (!password) throw new Errors.UserError("PasswordNotMatch")
 
     let usernameFields = Config.usernameFields
     if (!(usernameFields && usernameFields.length))
@@ -128,10 +128,10 @@ async function aSignIn(username, password) {
 
     let user = await EntityService.aFindOneByCriteria({}, 'F_User', criteria)
 
-    if (!user) throw new Error.UserError("UserNotExisted")
-    if (user.disabled) throw new Error.UserError("UserDisabled")
+    if (!user) throw new Errors.UserError("UserNotExisted")
+    if (user.disabled) throw new Errors.UserError("UserDisabled")
     if (Meta.hashPassword(password) !== user.password)
-        throw new Error.UserError("PasswordNotMatch")
+        throw new Errors.UserError("PasswordNotMatch")
 
     let session = {}
     session.userId = user._id

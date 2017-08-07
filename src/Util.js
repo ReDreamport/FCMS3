@@ -236,3 +236,11 @@ exports.isUserOrRoleHasFieldAction = function (user, entityName, fieldName,
 
     return false
 }
+
+exports.keepOnlyProperties = function (object, keeps) {
+    let o = {}
+    for (let p of keeps) {
+        o[p] = object[p]
+    }
+    return o
+}

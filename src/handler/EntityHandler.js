@@ -1,7 +1,7 @@
 const _ = require('lodash')
 
 // const Log = require('../Log')
-const Error = require('../Error')
+const Errors = require('../Errors')
 const Meta = require('../Meta')
 const Util = require('../Util')
 
@@ -14,7 +14,7 @@ exports.aCreateEntity = async function (ctx) {
     let entityName = ctx.params.entityName
 
     let instance = ctx.request.body
-    if (!instance) throw new Error.UserError("EmptyOperation")
+    if (!instance) throw new Errors.UserError("EmptyOperation")
 
     let r = await exports._aCreateEntity(ctx, entityName, instance)
 
@@ -24,8 +24,8 @@ exports.aCreateEntity = async function (ctx) {
 exports._aCreateEntity = async function (ctx, entityName, instance) {
     let entityMeta = Meta.getEntityMeta(entityName)
 
-    if (!entityMeta) throw new Error.UserError('NoSuchEntity')
-    if (entityMeta.noCreate) throw new Error.UserError('CreateNotAllow')
+    if (!entityMeta) throw new Errors.UserError('NoSuchEntity')
+    if (entityMeta.noCreate) throw new Errors.UserError('CreateNotAllow')
 
     instance = Meta.parseEntity(instance, entityMeta)
     exports.removeNoCreateFields(entityMeta, ctx.state.user, instance)
@@ -35,7 +35,7 @@ exports._aCreateEntity = async function (ctx, entityName, instance) {
         let value = instance[key]
         _.isNull(value) ? delete instance[key] : fieldCount++
     }
-    if (!fieldCount) throw new Error.UserError("EmptyOperation")
+    if (!fieldCount) throw new Errors.UserError("EmptyOperation")
 
     let operator = ctx.state.user
     instance._createdBy = operator && operator._id
@@ -54,17 +54,18 @@ exports._aCreateEntity = async function (ctx, entityName, instance) {
 }
 
 exports.aUpdateEntityById = async function (ctx) {
+    await exports._aUpdateEntityById (ctx, ctx.params.id, ctx.request.body)
+    ctx.status = 204
+}
+
+exports._aUpdateEntityById = async function (ctx, _id, instance) {
     let entityName = ctx.params.entityName
     let entityMeta = Meta.getEntityMeta(entityName)
 
-    if (!entityMeta) throw new Error.UserError('NoSuchEntity')
-    if (entityMeta.noEdit) throw new Error.UserError('EditNotAllow')
+    if (!entityMeta) throw new Errors.UserError('NoSuchEntity')
+    if (entityMeta.noEdit) throw new Errors.UserError('EditNotAllow')
 
-    let _id = Meta.parseId(ctx.params.id, entityMeta)
-    if (!_id) return ctx.status = 404
-
-    let instance = ctx.request.body
-
+    _id = Meta.parseId(_id, entityMeta)
     let criteria = { _id, _version: instance._version }
 
     instance = Meta.parseEntity(instance, entityMeta)
@@ -83,21 +84,19 @@ exports.aUpdateEntityById = async function (ctx) {
                     conn, entityName, criteria, instance)
             })
     })
-
-    ctx.status = 204
 }
 
 exports.aUpdateEntityInBatch = async function (ctx) {
     let entityName = ctx.params.entityName
     let entityMeta = Meta.getEntityMeta(entityName)
 
-    if (!entityMeta) throw new Error.UserError('NoSuchEntity')
-    if (entityMeta.noEdit) throw new Error.UserError('EditNotAllow')
+    if (!entityMeta) throw new Errors.UserError('NoSuchEntity')
+    if (entityMeta.noEdit) throw new Errors.UserError('EditNotAllow')
 
     let patch = ctx.request.body
 
     let idVersions = patch.idVersions
-    if (!idVersions.length > 0) throw new Error.UserError('EmptyOperation')
+    if (!idVersions.length > 0) throw new Errors.UserError('EmptyOperation')
     delete patch.idVersions
     for (let iv of idVersions) iv.id = Meta.parseId(iv.id, entityMeta)
 
@@ -129,15 +128,15 @@ exports.aDeleteEntityInBatch = async function (ctx) {
     let entityName = ctx.params.entityName
     let entityMeta = Meta.getEntityMeta(entityName)
 
-    if (!entityMeta) throw new Error.UserError('NoSuchEntity')
-    if (entityMeta.noDelete) throw new Error.UserError('DeleteNotAllow')
+    if (!entityMeta) throw new Errors.UserError('NoSuchEntity')
+    if (entityMeta.noDelete) throw new Errors.UserError('DeleteNotAllow')
 
     let ids = ctx.query && ctx.query._ids
     if (!ids) return ctx.status = 400
 
     ids = Util.splitString(ids, ",")
     ids = Meta.parseIds(ids, entityMeta)
-    if (!ids.length > 0) throw new Error.UserError('EmptyOperation')
+    if (!ids.length > 0) throw new Errors.UserError('EmptyOperation')
 
     let criteria = {
         __type: 'relation',
@@ -167,14 +166,14 @@ exports.aRecoverInBatch = async function (ctx) {
     let entityName = ctx.params.entityName
     let entityMeta = Meta.getEntityMeta(entityName)
 
-    if (!entityMeta) throw new Error.UserError('NoSuchEntity')
+    if (!entityMeta) throw new Errors.UserError('NoSuchEntity')
 
     let req = ctx.request.body || {}
     let ids = req.ids
-    if (!(ids && ids.length > 0)) throw new Error.UserError('EmptyOperation')
+    if (!(ids && ids.length > 0)) throw new Errors.UserError('EmptyOperation')
 
     ids = Meta.parseIds(ids, entityMeta)
-    if (!ids.length > 0) throw new Error.UserError('EmptyOperation')
+    if (!ids.length > 0) throw new Errors.UserError('EmptyOperation')
 
     await EntityService.aWithTransaction(entityMeta, async (conn) => {
         return await EntityService.aRecoverMany(conn, entityName, ids)
@@ -187,7 +186,7 @@ exports.aFindOneById = async function (ctx) {
     let entityName = ctx.params.entityName
     let entityMeta = Meta.getEntityMeta(entityName)
 
-    if (!entityMeta) throw new Error.UserError('NoSuchEntity')
+    if (!entityMeta) throw new Errors.UserError('NoSuchEntity')
 
     let _id = Meta.parseId(ctx.params.id, entityMeta)
     if (!_id) return ctx.status = 404
@@ -227,7 +226,7 @@ exports.aList = async function (ctx) {
 
 exports._aList = async function (ctx, entityName, queryModifier) {
     let entityMeta = Meta.getEntityMeta(entityName)
-    if (!entityMeta) throw new Error.UserError('NoSuchEntity')
+    if (!entityMeta) throw new Errors.UserError('NoSuchEntity')
 
     let query = exports.parseListQuery(entityMeta, ctx.query)
     if (queryModifier) queryModifier(query)
@@ -294,7 +293,7 @@ exports.parseListQuery = function (entityMeta, query) {
             try {
                 criteria = JSON.parse(query._criteria)
             } catch (e) {
-                throw new Error.UserError("BadQueryCriteria")
+                throw new Errors.UserError("BadQueryCriteria")
             }
         } else {
             let criteriaList = []

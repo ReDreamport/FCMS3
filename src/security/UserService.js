@@ -1,7 +1,7 @@
 const chance = new require('chance')()
 const _ = require('lodash')
 
-const Error = require('../Error')
+const Errors = require('../Errors')
 const Log = require('../Log')
 const Meta = require('../Meta')
 const Config = require('../Config')
@@ -128,7 +128,7 @@ exports.aAuthToken = async function (origin, userId, userToken) {
 // 登录
 // TODO 思考：如果用户之前登录此子应用的 session 未过期，是返回之前的 session 还是替换 session
 exports.aSignIn = async function (origin, username, password) {
-    if (!password) throw new Error.UserError("PasswordNotMatch")
+    if (!password) throw new Errors.UserError("PasswordNotMatch")
 
     let usernameFields = Config.usernameFields
     if (!(usernameFields && usernameFields.length))
@@ -141,10 +141,10 @@ exports.aSignIn = async function (origin, username, password) {
 
     let user = await EntityService.aFindOneByCriteria({}, 'F_User', criteria)
 
-    if (!user) throw new Error.UserError("UserNotExisted")
-    if (user.disabled) throw new Error.UserError("UserDisabled")
+    if (!user) throw new Errors.UserError("UserNotExisted")
+    if (user.disabled) throw new Errors.UserError("UserDisabled")
     if (Meta.hashPassword(password) !== user.password)
-        throw new Error.UserError("PasswordNotMatch")
+        throw new Errors.UserError("PasswordNotMatch")
 
     let session = await exports.aSignInSuccessfully(origin, user)
 
@@ -208,10 +208,10 @@ exports.aAddUser = async function (userInput) {
 exports.aChangePassword = async function (userId, oldPassword, newPassword) {
     let user = await EntityService.aFindOneByCriteria({},
         'F_User', { _id: userId })
-    if (!user) throw new Error.UserError("UserNotExisted")
-    if (user.disabled) throw new Error.UserError("UserDisabled")
+    if (!user) throw new Errors.UserError("UserNotExisted")
+    if (user.disabled) throw new Errors.UserError("UserDisabled")
     if (Meta.hashPassword(oldPassword) !== user.password)
-        throw new Error.UserError("PasswordNotMatch")
+        throw new Errors.UserError("PasswordNotMatch")
 
     let update = { password: Meta.hashPassword(newPassword) }
     await EntityService.aUpdateOneByCriteria({},

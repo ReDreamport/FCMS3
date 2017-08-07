@@ -17,10 +17,10 @@ async function aUpload(files, query) {
 
     let entityMeta = Meta.getEntityMeta(entityName)
     if (!entityMeta)
-        throw new Error.UserError("NoSuchEntity", "无此实体 " + entityName)
+        throw new Errors.UserError("NoSuchEntity", "无此实体 " + entityName)
     let fieldMeta = entityMeta.fields[fieldName]
     if (!fieldMeta)
-        throw new Error.UserError("NoSuchEntityField",
+        throw new Errors.UserError("NoSuchEntityField",
             `无此字段 ${entityName}.${fieldName}`)
 
     let subDir = fieldMeta.fileStoreDir || "default"

@@ -1,5 +1,5 @@
 const _ = require('lodash')
-const Error = require('../Error')
+const Errors = require('../Errors')
 const Config = require('../Config')
 
 const UserService = require('../security/UserService')
@@ -67,7 +67,7 @@ exports.aChangePassword = async function (ctx) {
     let req = ctx.request.body
 
     if (!checkPasswordFormat(req.newPassword, Config.passwordFormat))
-        throw new Error.UserError('BadPasswordFormat')
+        throw new Errors.UserError('BadPasswordFormat')
 
     await UserService.aChangePassword(ctx.state.user._id,
         req.oldPassword, req.newPassword)

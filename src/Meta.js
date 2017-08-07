@@ -54,7 +54,11 @@ Redis.subscribe('MetaChange', async function (metaStoreId) {
 })
 
 // 获取实体
-exports.getEntityMeta = (name) => entities[name]
+exports.getEntityMeta = (name) => {
+    let e = entities[name]
+    if (!e) throw new Error("No such entity meta: " + name)
+    return e
+}
 
 // 获取纯实体
 exports.getEntities = () => entities

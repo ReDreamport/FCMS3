@@ -1,6 +1,6 @@
 const _ = require('lodash')
 
-const Error = require('../Error')
+const Errors = require('../Errors')
 const Util = require('../Util')
 const Meta = require('../Meta')
 
@@ -12,7 +12,7 @@ const Mysql = require('../storage/Mysql')
 
 exports.aCreate = async function (conn, entityName, instance) {
     "use strict"
-    if (!_.size(instance)) throw new Error.UserError("CreateEmpty")
+    if (!_.size(instance)) throw new Errors.UserError("CreateEmpty")
     let entityMeta = Meta.getEntityMeta(entityName)
 
     instance._version = 1

@@ -1,5 +1,5 @@
 const Log = require('../Log')
-const Error = require('../Error')
+const Errors = require('../Errors')
 const Config = require('../Config')
 
 const UserService = require('../security/UserService')
@@ -16,7 +16,7 @@ exports.aIdentifyUser = async function (ctx, next) {
     // Log.debug("ips", ctx.request.ips)
 
     let originConfig = Config.originConfigs[ctx.request.origin]
-    if (!originConfig) throw new Error.UserError("BadOrigin", "BadOrigin")
+    if (!originConfig) throw new Errors.UserError("BadOrigin", "BadOrigin")
 
     ctx.state.trackId = ctx.cookies.get('TID', { signed: true })
 
@@ -39,7 +39,7 @@ exports.aIdentifyUser = async function (ctx, next) {
 exports.aControlAccess = async function (ctx, next) {
     let pass = await aCheckAll(ctx)
     if (!pass)
-        throw ctx.state.user ? new Error.Error403() : new Error.Error401()
+        throw ctx.state.user ? new Errors.Error403() : new Errors.Error401()
     await next()
 }
 
