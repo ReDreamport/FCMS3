@@ -29,7 +29,7 @@ const MySQLPersistTypes = ["varchar", "char", "blob", "text",
 
 exports.AllPersistTypes = MongoPersistTypes.concat(MySQLPersistTypes)
 
-exports.InputTypes = ["Text", "Password", "TextArea", "RichText",
+exports.InputTypes = ["Text", "Password", "TextArea", "RichText", "JSON",
     "Select", "Check", "Int", "Float", "CheckList",
     "Date", "Time", "DateTime", "File", "Image",
     "InlineComponent", "PopupComponent", "TabledComponent", "Reference"]
