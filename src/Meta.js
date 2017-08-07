@@ -271,7 +271,6 @@ exports.getCollectionName = function (entityMeta, repo) {
         return entityMeta.tableName + "_trash"
     else
         return entityMeta.tableName
-
 }
 
 exports.newObjectId = function () {

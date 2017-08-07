@@ -17,8 +17,9 @@ exports.start = function (appConfig, addRouteRules, extraEntities) {
     process.on('SIGTERM', onProcessTerm)
 
     return aStart(appConfig, addRouteRules, extraEntities).catch(function (e) {
-        Log.system.error(e, 'Fail to start')
+        console.log(e)
         stop()
+        return Promise.resolve(true)
     })
 }
 

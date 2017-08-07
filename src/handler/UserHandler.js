@@ -1,4 +1,5 @@
-const Error = require('../error')
+const _ = require('lodash')
+const Error = require('../Error')
 const Config = require('../Config')
 
 const UserService = require('../security/UserService')
@@ -17,8 +18,12 @@ exports.clearUserSessionCookies = function (ctx) {
 
 exports.aPing = async function (ctx) {
     let user = ctx.state.user
+
     if (user) {
-        let userToFront = { userId: user._id, admin: user.admin, acl: user.acl }
+        let userToFront = _.clone(user)
+        delete userToFront.password
+        delete userToFront.disasbled
+
         userToFront.roles = {}
         if (user.roles) {
             for (let roleId of user.roles) {

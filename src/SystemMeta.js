@@ -904,7 +904,7 @@ const SystemEntities = {
         db: Meta.DB.mongo,
         dbName: "main",
         tableName: 'F_SsoClientToken',
-        digestFields: 'name,entityName',
+        digestFields: '',
         fields: {
             origin: { name: 'origin',
                 label: '客户端域',

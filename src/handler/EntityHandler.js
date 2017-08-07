@@ -12,13 +12,20 @@ const Cache = require('../cache/Cache')
 
 exports.aCreateEntity = async function (ctx) {
     let entityName = ctx.params.entityName
+
+    let instance = ctx.request.body
+    if (!instance) throw new Error.UserError("EmptyOperation")
+
+    let r = await exports._aCreateEntity(ctx, entityName, instance)
+
+    ctx.body = { id: r._id }
+}
+
+exports._aCreateEntity = async function (ctx, entityName, instance) {
     let entityMeta = Meta.getEntityMeta(entityName)
 
     if (!entityMeta) throw new Error.UserError('NoSuchEntity')
     if (entityMeta.noCreate) throw new Error.UserError('CreateNotAllow')
-
-    let instance = ctx.request.body
-    if (!instance) throw new Error.UserError("EmptyOperation")
 
     instance = Meta.parseEntity(instance, entityMeta)
     exports.removeNoCreateFields(entityMeta, ctx.state.user, instance)
@@ -43,7 +50,7 @@ exports.aCreateEntity = async function (ctx) {
         })
     })
 
-    ctx.body = { id: r._id }
+    return { id: r._id }
 }
 
 exports.aUpdateEntityById = async function (ctx) {
@@ -212,10 +219,18 @@ exports.aFindOneById = async function (ctx) {
 
 exports.aList = async function (ctx) {
     let entityName = ctx.params.entityName
+
+    let r = await exports._aList(ctx, entityName, null)
+
+    ctx.body = r
+}
+
+exports._aList = async function (ctx, entityName, queryModifier) {
     let entityMeta = Meta.getEntityMeta(entityName)
     if (!entityMeta) throw new Error.UserError('NoSuchEntity')
 
     let query = exports.parseListQuery(entityMeta, ctx.query)
+    if (queryModifier) queryModifier(query)
 
     let gIntercept = Interceptor.getInterceptor(entityName,
         Interceptor.Actions.List)
@@ -236,7 +251,7 @@ exports.aList = async function (ctx) {
     r.pageNo = query.pageNo
     r.pageSize = query.pageSize
 
-    ctx.body = r
+    return r
 }
 
 exports.parseListQuery = function (entityMeta, query) {

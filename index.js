@@ -1,2 +1,7 @@
 exports.Extension = require('./src/Extension')
 exports.Main = require('./src/Main')
+exports.Meta = require('./src/Meta')
+exports.Error = require('./src/Error')
+exports.Log = require('./src/Log')
+exports.EntityHandler = require('./src/handler/EntityHandler')
+exports.EntityService = require('./src/service/EntityService')
