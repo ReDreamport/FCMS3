@@ -16,7 +16,8 @@ exports.aIdentifyUser = async function (ctx, next) {
     // Log.debug("ips", ctx.request.ips)
 
     let originConfig = Config.originConfigs[ctx.request.origin]
-    if (!originConfig) throw new Errors.UserError("BadOrigin", "BadOrigin")
+    if (!originConfig) throw new Errors.UserError("BadOrigin",
+        "BadOrigin " + ctx.request.origin)
 
     ctx.state.trackId = ctx.cookies.get('TID', { signed: true })
 
