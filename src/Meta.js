@@ -265,6 +265,11 @@ exports.formatEntityToHttp = function (entityValue, entityMeta) {
     return output
 }
 
+exports.formatEntitiesToHttp = function (entities, entityMeta) {
+    if (!(entities && entities.length)) return entities
+    return _.map(entities, (e) => exports.formatEntityToHttp(e, entityMeta))
+}
+
 exports.hashPassword = function (password) {
     if (!password) return password
     return crypto.createHash('md5').update(password + password).digest('hex')
