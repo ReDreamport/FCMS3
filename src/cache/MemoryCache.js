@@ -7,14 +7,16 @@ let cache = {}
 exports.cache = cache
 
 async function aGet(keysArray, alternative) {
-    let r = await Promise.resolve(_.get(cache, keysArray) || alternative)
-    // Log.debug('get memory cache', keysArray)
+    let fieldNames = keysArray.join(".")
+    // Log.debug('get memory cache', fieldNames)
+    let r = await Promise.resolve(_.get(cache, fieldNames) || alternative)
     return r
 }
 
 async function aSet(keysArray, value) {
-    // Log.debug('set memory cache', keysArray)
-    await Promise.resolve(_.set(cache, keysArray, value))
+    let fieldNames = keysArray.join(".")
+    // Log.debug('set memory cache', fieldNames)
+    await Promise.resolve(_.set(cache, fieldNames, value))
 }
 
 exports.aGetString = aGet
@@ -35,10 +37,10 @@ exports.aUnset = async function (keysArray, lastKeys) {
         let keysLength = keys.length
         for (let lastKey of lastKeys) {
             keys[keysLength] = lastKey
-            _.unset(cache, keys)
+            _.unset(cache, keys.join("."))
         }
     } else {
-        _.unset(cache, keysArray)
+        _.unset(cache, keysArray.join("."))
     }
 }
 
@@ -46,5 +48,4 @@ exports.aClearAllCache = async function () {
     Log.system.info("clear all cache / memory")
     cache = {}
     exports.cache = cache
-
 }

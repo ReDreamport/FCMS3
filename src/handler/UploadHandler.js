@@ -3,12 +3,14 @@ const path = require('path')
 const Config = require('../Config')
 const FileUtil = require('../FileUtil')
 const Meta = require('../Meta')
+const Errors = require('../Errors')
 
 async function aUpload(files, query) {
     if (!files) return false
 
-    let file = Object.keys(files)[0]
-    if (!file) return false
+    let fileKey = Object.keys(files)[0]
+    if (!fileKey) return false
+    let file = files[fileKey]
 
     let entityName = query.entityName
     let fieldName = query.fieldName

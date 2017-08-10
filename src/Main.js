@@ -28,7 +28,7 @@ async function aStart(appConfig, addRouteRules, extraEntities) {
     Object.assign(Config, appConfig)
     Log.config(Config)
 
-    console.log("\n\n\n\n\n")
+    console.log("---")
     Log.system.info('Starting FCMS...')
 
     // 持久层初始化

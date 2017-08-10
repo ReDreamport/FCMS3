@@ -21,12 +21,14 @@ exports.aWithCache = async function (entityMeta, cacheId, aQuery) {
         return await aQuery()
     else {
         let keys = _.concat(['Entity', entityMeta.name], cacheId)
+        // console.log("cacheId", cacheId)
+        // console.log("keys", keys)
         let cacheItem = await Cache.aGetObject(keys)
         if (!_.isNil(cacheItem))
             return _.cloneDeep(cacheItem) // 返回拷贝，以防止污染缓存
 
         let freshValue = await aQuery()
-        if (_.isNil(cacheItem)) return freshValue // TODO 空值暂不缓存
+        if (_.isNil(freshValue)) return freshValue // TODO 空值暂不缓存
 
         await Cache.aSetObject(keys, freshValue)
         return _.cloneDeep(freshValue) // 返回拷贝，以防止污染缓存
