@@ -1,7 +1,6 @@
-const _ = require('lodash')
-const Promise = require('bluebird')
+const _ = require("lodash")
 
-const Log = require('../Log')
+const Log = require("../Log")
 
 let cache = {}
 exports.cache = cache
@@ -30,7 +29,7 @@ exports.aSetObject = aSet
 
 // keysArray, lastKeys 都是数组
 // 例如 aUnset(["a","b"],["1","2"] 可以删除键 "a.b.1" 和 "a.b.2"
-exports.aUnset = async function (keysArray, lastKeys) {
+exports.aUnset = async function(keysArray, lastKeys) {
     // Log.debug('unset memory cache', keys, lastKeys)
     if (lastKeys && lastKeys.length) {
         let keys = _.clone(keysArray)
@@ -44,7 +43,7 @@ exports.aUnset = async function (keysArray, lastKeys) {
     }
 }
 
-exports.aClearAllCache = async function () {
+exports.aClearAllCache = async function() {
     Log.system.info("clear all cache / memory")
     cache = {}
     exports.cache = cache
