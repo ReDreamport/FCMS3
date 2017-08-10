@@ -1,4 +1,5 @@
 const Log = require('../Log')
+const Util = require('../Util')
 const Errors = require('../Errors')
 const Config = require('../Config')
 
@@ -19,10 +20,11 @@ exports.aIdentifyUser = async function (ctx, next) {
     if (!originConfig) throw new Errors.UserError("BadOrigin",
         "BadOrigin " + ctx.request.origin)
 
-    ctx.state.trackId = ctx.cookies.get('TID', { signed: true })
+    let [trackId, userId, userToken ]
+        = Util.getSingedPortedCookies(ctx, 'TID', 'UserId', 'UserToken')
 
-    let userId = ctx.cookies.get('UserId', { signed: true })
-    let userToken = ctx.cookies.get('UserToken', { signed: true })
+    ctx.state.trackId = trackId
+
     let origin = ctx.request.origin
 
     if (userId && userToken)

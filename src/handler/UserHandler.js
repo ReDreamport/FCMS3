@@ -1,6 +1,7 @@
 const _ = require('lodash')
 const Errors = require('../Errors')
 const Config = require('../Config')
+const Util = require('../Util')
 
 const UserService = require('../security/UserService')
 // const SecurityCodeService = require('../security/SecurityCodeService')
@@ -12,8 +13,7 @@ function checkPasswordFormat(password, format) {
 exports.checkPasswordFormat = checkPasswordFormat
 
 exports.clearUserSessionCookies = function (ctx) {
-    ctx.cookies.set('UserId', null, { signed: true, httpOnly: true })
-    ctx.cookies.set('UserToken', null, { signed: true, httpOnly: true })
+    Util.setSingedPortedCookies(ctx, { UserId: null, UserToken: null })
 }
 
 exports.aPing = async function (ctx) {
@@ -46,10 +46,8 @@ exports.aSignIn = async function (ctx) {
     let session = await UserService.aSignIn(origin, req.username, req.password)
     ctx.body = { userId: session.userId }
 
-    ctx.cookies.set('UserId', session.userId,
-        { signed: true, httpOnly: true })
-    ctx.cookies.set('UserToken', session.userToken,
-        { signed: true, httpOnly: true })
+    Util.setSingedPortedCookies(ctx,
+        { UserId: session.userId, UserToken: session.userToken })
 }
 
 // 登出接口

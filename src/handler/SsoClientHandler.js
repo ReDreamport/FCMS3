@@ -1,6 +1,7 @@
 const rp = require('request-promise-native')
 
 const Log = require('../Log')
+const Util = require('../Util')
 const Config = require('../Config')
 const Errors = require('../Errors')
 const EntityService = require('../service/EntityService')
@@ -37,10 +38,8 @@ exports.aAcceptToken = async function (ctx) {
         let session = await UserService.aSignInSuccessfully(origin, user)
 
         // TODO 把设置本机登录 Cookies 的放在一处
-        ctx.cookies.set('UserId', session.userId,
-            { signed: true, httpOnly: true })
-        ctx.cookies.set('UserToken', session.userToken,
-            { signed: true, httpOnly: true })
+        Util.setSingedPortedCookies(ctx,
+            { UserId: session.userId, UserToken: session.userToken })
 
         ctx.redirect(callback)
     } catch (e) {

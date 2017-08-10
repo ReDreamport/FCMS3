@@ -244,3 +244,25 @@ exports.keepOnlyProperties = function (object, keeps) {
     }
     return o
 }
+
+exports.getSingedPortedCookies = function (ctx, ...names) {
+    let origin = ctx.request.origin
+    let lastSepIndex = origin.lastIndexOf(":")
+    let port = lastSepIndex >= 0
+        ? origin.substring(lastSepIndex + 1)
+        : 80
+    // console.log("port", port)
+    return _.map(names,
+        (n) => ctx.cookies.get(`${n}-${port}`, { signed: true }))
+}
+
+exports.setSingedPortedCookies = function (ctx, pairs) {
+    let origin = ctx.request.origin
+    let lastSepIndex = origin.lastIndexOf(":")
+    let port = lastSepIndex >= 0
+        ? origin.substring(lastSepIndex + 1)
+        : 80
+    for (let name in pairs) {
+        ctx.cookies.set(`${name}-${port}`, pairs[name], { signed: true })
+    }
+}
