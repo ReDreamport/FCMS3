@@ -16,74 +16,39 @@ function patchSystemFields(entityMeta) {
     let userIdPersistType = dbType === Meta.DB.mongo && "String" || "char"
 
     fields._id = {
-        system: true,
-        name: "_id",
-        label: "ID",
-        type: idType,
+        system: true, name: "_id", label: "ID", type: idType,
         required: true,
-        persistType: idPersistType,
-        sqlColM: Meta.ObjectIdStringLength,
-        inputType: "Text",
-        noCreate: true,
-        noEdit: true,
-        fastFilter: true
+        persistType: idPersistType, sqlColM: Meta.ObjectIdStringLength,
+        inputType: "Text", noCreate: true, noEdit: true, fastFilter: true
     }
     fields._version = {
-        system: true,
-        name: "_version",
-        label: "修改版本",
-        type: "Int",
-        persistType: intPersistType,
-        sqlColM: 12,
-        inputType: "Int",
-        noCreate: true,
-        noEdit: true,
-        hideInListPage: true
+        system: true, name: "_version", label: "修改版本", type: "Int",
+        persistType: intPersistType, sqlColM: 12,
+        inputType: "Int", noCreate: true, noEdit: true, hideInListPage: true
     }
     fields._createdOn = {
-        system: true,
-        name: "_createdOn",
-        label: "创建时间",
-        type: "DateTime",
+        system: true, name: "_createdOn", label: "创建时间", type: "DateTime",
         persistType: timestampPersistType,
-        inputType: "DateTime",
-        noCreate: true,
-        noEdit: true
+        inputType: "DateTime", noCreate: true, noEdit: true,
+        hideInListPage: true
     }
     fields._modifiedOn = {
-        system: true,
-        name: "_modifiedOn",
-        label: "修改时间",
-        type: "DateTime",
+        system: true, name: "_modifiedOn", label: "修改时间", type: "DateTime",
         persistType: timestampPersistType,
-        inputType: "DateTime",
-        noCreate: true,
-        noEdit: true
+        inputType: "DateTime", noCreate: true, noEdit: true
     }
     fields._createdBy = {
-        system: true,
-        name: "_createdBy",
-        label: "创建人",
-        type: "Reference",
+        system: true, name: "_createdBy", label: "创建人", type: "Reference",
         refEntity: "F_User",
-        persistType: userIdPersistType,
-        sqlColM: Meta.ObjectIdStringLength,
-        inputType: "Reference",
-        noCreate: true,
-        noEdit: true,
+        persistType: userIdPersistType, sqlColM: Meta.ObjectIdStringLength,
+        inputType: "Reference", noCreate: true, noEdit: true,
         hideInListPage: true
     }
     fields._modifiedBy = {
-        system: true,
-        name: "_modifiedBy",
-        label: "修改人",
-        type: "Reference",
+        system: true, name: "_modifiedBy", label: "修改人", type: "Reference",
         refEntity: "F_User",
-        persistType: userIdPersistType,
-        sqlColM: Meta.ObjectIdStringLength,
-        inputType: "Reference",
-        noCreate: true,
-        noEdit: true,
+        persistType: userIdPersistType, sqlColM: Meta.ObjectIdStringLength,
+        inputType: "Reference", noCreate: true, noEdit: true,
         hideInListPage: true
     }
 
@@ -205,6 +170,11 @@ const SystemEntities = {
                 inputType: "Text",
                 hideInListPage: true
             },
+            fieldGroups: {
+                name: "fieldGroups", label: "字段分组", type: "Component",
+                refEntity: "F_KeyValue", inputType: "PopupComponent",
+                multiple: true
+            },
             fields: {
                 name: "fields",
                 label: "字段列表",
@@ -225,13 +195,9 @@ const SystemEntities = {
         editEnhanceFunc: "F.enhanceFieldMetaEdit",
         fields: {
             system: {
-                name: "system",
-                label: "系统字段",
-                type: "Boolean",
+                name: "system", label: "系统字段", type: "Boolean",
                 inputType: "Check",
-                noCreate: true,
-                noEdit: true,
-                hideInListPage: true
+                noCreate: true, noEdit: true, hideInListPage: true
             },
             name: {
                 name: "name", label: "字段名", type: "String",
@@ -241,56 +207,41 @@ const SystemEntities = {
                 name: "label", label: "显示名", type: "String",
                 inputType: "Text"
             },
+            group: {
+                name: "group", label: "分组键", type: "String",
+                inputType: "Text"
+            },
             comment: {
-                name: "comment",
-                label: "开发备注",
-                type: "String",
-                inputType: "TextArea",
-                hideInListPage: true
+                name: "comment", label: "开发备注", type: "String",
+                inputType: "TextArea", hideInListPage: true
             },
             useGuide: {
-                name: "useGuide",
-                label: "使用备注",
-                type: "String",
-                inputType: "Text",
-                hideInListPage: true
+                name: "useGuide", label: "使用备注", type: "String",
+                inputType: "Text", hideInListPage: true
             },
             type: {
-                name: "type",
-                label: "类型",
-                type: "String",
+                name: "type", label: "类型", type: "String",
                 inputType: "Select",
                 options: arrayToOption(Meta.FieldDataTypes)
             },
             unique: {
-                name: "unique",
-                label: "值唯一",
-                type:
-                "Boolean",
-                inputType: "Check",
-                hideInListPage: true
+                name: "unique", label: "值唯一", type: "Boolean",
+                inputType: "Check", hideInListPage: true
             },
             refEntity: {
-                name: "refEntity",
-                label: "关联实体",
-                type: "String",
+                name: "refEntity", label: "关联实体", type: "String",
                 inputType: "Text"
             },
             inputType: {
-                name: "inputType",
-                label: "输入类型",
-                type: "String",
+                name: "inputType", label: "输入类型", type: "String",
                 inputType: "Select",
                 optionsDependOnField: "type",
                 optionsFunc: "F.optionsOfInputType",
                 hideInListPage: true
             },
             inputFunc: {
-                name: "inputFunc",
-                label: "输入构建器",
-                type: "String",
-                inputType: "Text",
-                hideInListPage: true
+                name: "inputFunc", label: "输入构建器", type: "String",
+                inputType: "Text", hideInListPage: true
             },
             inputRequired: {
                 name: "inputRequired",
@@ -954,6 +905,21 @@ const SystemEntities = {
                 label: "授权令牌",
                 type: "String",
                 inputType: "Text",
+                persistType: "String"
+            }
+        }
+    },
+    F_KeyValue: {
+        system: true, name: "F_KeyValue", label: "键值对",
+        db: Meta.DB.mongo, dbName: "main", tableName: "F_KeyValue",
+        digestFields: "key",
+        fields: {
+            key: {
+                name: "key", label: "键", type: "String", inputType: "Text",
+                persistType: "String"
+            },
+            value: {
+                name: "value", label: "值", type: "String", inputType: "Text",
                 persistType: "String"
             }
         }
