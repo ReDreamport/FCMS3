@@ -112,6 +112,12 @@ exports.entityListToIdMap = function(list) {
     return map
 }
 
+exports.listToMap = function(list, keyField) {
+    let map = {}
+    for (let i of list) map[i[keyField]] = i
+    return map
+}
+
 exports.objectIdsEquals = function(a, b) {
     return _.isNull(a) && _.isNull(b) || a.toString() === b.toString()
 }
