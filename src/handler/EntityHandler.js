@@ -90,7 +90,7 @@ exports._aUpdateEntityById = async function(ctx, entityName, _id, instance) {
     if (entityMeta.noEdit) throw new Errors.UserError("EditNotAllow")
 
     _id = Meta.parseId(_id, entityMeta)
-    let criteria = {_id, _version: instance._version}
+    let criteria = {_id}
 
     instance = Meta.parseEntity(instance, entityMeta)
     exports.removeNoEditFields(entityMeta, ctx.state.user, instance)
@@ -116,10 +116,12 @@ exports.aUpdateEntityInBatch = async function(ctx) {
 
     let patch = ctx.request.body
 
-    let idVersions = patch.idVersions
-    if (!idVersions.length > 0) throw new Errors.UserError("EmptyOperation")
-    delete patch.idVersions
-    for (let iv of idVersions) iv.id = Meta.parseId(iv.id, entityMeta)
+    let idStrings = patch.ids
+    delete patch.ids
+    if (!(idStrings && idStrings.length > 0))
+        throw new Errors.UserError("EmptyOperation")
+    let ids = Meta.parseIds(idStrings)
+    if (!(ids && ids.length > 0)) throw new Errors.UserError("EmptyOperation")
 
     patch = Meta.parseEntity(patch, entityMeta)
     exports.removeNoEditFields(entityMeta, ctx.state.user, patch)
@@ -131,8 +133,8 @@ exports.aUpdateEntityInBatch = async function(ctx) {
         Interceptor.Actions.Update)
 
     await EntityService.aWithTransaction(entityMeta, async conn => {
-        for (let p of idVersions) {
-            let criteria = {_id: p.id, _version: p._version}
+        for (let id of ids) {
+            let criteria = {_id: id}
             return aIntercept(conn, criteria, patch, operator,
                 async conn2 => EntityService.aUpdateOneByCriteria(
                     conn2, entityName, criteria, patch))
@@ -157,13 +159,8 @@ exports.aDeleteEntityInBatch = async function(ctx) {
     if (!ids.length > 0) throw new Errors.UserError("EmptyOperation")
 
     let criteria = {
-        __type: "relation",
-        relation: "and",
-        items: [{
-            field: "_id",
-            operator: "in",
-            value: ids
-        }]
+        __type: "relation", relation: "and",
+        items: [{field: "_id", operator: "in", value: ids}]
     }
 
     let operator = ctx.state.user

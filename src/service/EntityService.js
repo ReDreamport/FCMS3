@@ -119,7 +119,6 @@ exports.aRecoverMany = async function(conn, entityName, ids) {
     }
 }
 
-
 exports.aFindOneById = async function(conn, entityName, id, options) {
     let entityMeta = Meta.getEntityMeta(entityName)
 
