@@ -198,12 +198,15 @@ exports.aRecoverInBatch = async function(ctx) {
 }
 
 exports.aFindOneById = async function(ctx) {
-    let entityName = ctx.params.entityName
+    await exports._aFindOneById(ctx, ctx.params.entityName, ctx.params.id)
+}
+
+exports._aFindOneById = async function(ctx, entityName, id) {
     let entityMeta = Meta.getEntityMeta(entityName)
 
     if (!entityMeta) throw new Errors.UserError("NoSuchEntity")
 
-    let _id = Meta.parseId(ctx.params.id, entityMeta)
+    let _id = Meta.parseId(id, entityMeta)
     if (!_id) return ctx.status = 404
 
     let aIntercept = Interceptor.getInterceptor(entityName,

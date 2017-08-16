@@ -222,7 +222,12 @@ function splitPath(aPath) {
 }
 
 function addRouteRules(method, url, info, ...handlers) {
-    let key = method + url
-    let handler = handlers.length === 1 ? handlers[0] : compose(handlers)
-    routes[key] = {method, url, info, handler, indexToVariable: {}}
+    try {
+        let key = method + url
+        let handler = handlers.length === 1 ? handlers[0] : compose(handlers)
+        routes[key] = {method, url, info, handler, indexToVariable: {}}
+    } catch (e) {
+        Log.system.error(e, method, url)
+        throw e
+    }
 }
