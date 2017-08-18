@@ -195,7 +195,14 @@ exports.aRecoverInBatch = async function(ctx) {
 }
 
 exports.aFindOneById = async function(ctx) {
-    await exports._aFindOneById(ctx, ctx.params.entityName, ctx.params.id)
+    let entity = await exports._aFindOneById(ctx,
+        ctx.params.entityName, ctx.params.id)
+
+    if (entity) {
+        ctx.body = entity
+    } else {
+        ctx.status = 404
+    }
 }
 
 exports._aFindOneById = async function(ctx, entityName, id) {
@@ -223,9 +230,9 @@ exports._aFindOneById = async function(ctx, entityName, id) {
         exports.removeNotShownFields(entityMeta, ctx.state.user, entity)
         entity = Meta.formatEntityToHttp(entity, entityMeta)
         ctx.body = entity
-    } else {
-        ctx.status = 404
     }
+
+    return entity
 }
 
 exports.aList = async function(ctx) {
