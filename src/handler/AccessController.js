@@ -22,6 +22,10 @@ exports.aIdentifyUser = async function(ctx, next) {
 
     let [trackId, userId, userToken] =
         Util.getSingedPortedCookies(ctx, "TID", "UserId", "UserToken")
+    if (!(trackId || userId || userToken)) {
+        [trackId, userId, userToken] =
+            Util.getMyRequestHeaders(ctx, "TID", "UserId", "UserToken")
+    }
 
     ctx.state.trackId = trackId
 

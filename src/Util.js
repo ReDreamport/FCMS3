@@ -255,23 +255,34 @@ exports.keepOnlyProperties = function(object, keeps) {
 }
 
 exports.getSingedPortedCookies = function(ctx, ...names) {
-    let origin = ctx.request.origin
-    let lastSepIndex = origin.lastIndexOf(":")
-    let port = lastSepIndex >= 0 ?
-        origin.substring(lastSepIndex + 1) :
-        80
+    let port = getPortOfUrl(ctx.request.origin)
     // console.log("port", port)
     return _.map(names,
         n => ctx.cookies.get(`${n}-${port}`, {signed: true}))
 }
 
 exports.setSingedPortedCookies = function(ctx, pairs) {
-    let origin = ctx.request.origin
-    let lastSepIndex = origin.lastIndexOf(":")
-    let port = lastSepIndex >= 0 ?
-        origin.substring(lastSepIndex + 1) :
-        80
+    let port = getPortOfUrl(ctx.request.origin)
     for (let name in pairs) {
         ctx.cookies.set(`${name}-${port}`, pairs[name], {signed: true})
     }
 }
+
+exports.getMyRequestHeaders = function(ctx, ...names) {
+    return _.map(names,
+        n => ctx.headers[`X-FCMS-${n}`.toLowerCase()])
+}
+
+exports.setMyRequestHeaders = function(ctx, pairs) {
+    for (let name in pairs) {
+        ctx.response.headers.set(`X-FCMS-${name}`.toLowerCase(), pairs[name])
+    }
+}
+
+function getPortOfUrl(url) {
+    let lastSepIndex = url.lastIndexOf(":")
+    let port = lastSepIndex >= 0 ?
+        url.substring(lastSepIndex + 1) : 80
+    return port
+}
+

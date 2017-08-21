@@ -44,7 +44,7 @@ exports.aSignIn = async function(ctx) {
 
     let origin = ctx.request.origin
     let session = await UserService.aSignIn(origin, req.username, req.password)
-    ctx.body = {userId: session.userId}
+    ctx.body = {userId: session.userId, userToken: session.userToken}
 
     Util.setSingedPortedCookies(ctx,
         {UserId: session.userId, UserToken: session.userToken})
