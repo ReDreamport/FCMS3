@@ -279,6 +279,13 @@ exports.setMyRequestHeaders = function(ctx, pairs) {
     }
 }
 
+exports.firstValueOfObject = function(object) {
+    for (let name in object) {
+        return object[name]
+    }
+    return null
+}
+
 function getPortOfUrl(url) {
     let lastSepIndex = url.lastIndexOf(":")
     let port = lastSepIndex >= 0 ?

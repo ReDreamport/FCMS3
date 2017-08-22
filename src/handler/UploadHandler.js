@@ -4,6 +4,7 @@ const Config = require("../Config")
 const FileUtil = require("../FileUtil")
 const Meta = require("../Meta")
 const Errors = require("../Errors")
+const Util = require("../Util")
 
 async function aUpload(files, query) {
     if (!files) return false
@@ -68,6 +69,21 @@ exports.aUploadForRichText = async function(ctx) {
     let result = await exports.aUploadUtil(file, "RichText")
     ctx.type = "text/html"
     ctx.body = Config.fileDownloadPrefix + result.fileRelativePath
+}
+
+exports.aUploadForCkEditor = async function(ctx) {
+    let files = ctx.request.body.files
+    if (!files) return ctx.status = 400
+    let file = Util.firstValueOfObject(files)
+    if (!file) return ctx.status = 400
+
+    // let CKEditor = ctx.query.CKEditor
+    let CKEditorFuncNum = ctx.query.CKEditorFuncNum
+
+    let result = await exports.aUploadUtil(file, "RichText")
+    let filePath = Config.fileDownloadPrefix + result.fileRelativePath
+    let js = `window.parent.CKEDITOR.tools.callFunction("${CKEditorFuncNum}", "${filePath}", "");`
+    ctx.body = "<script type=\"text/javascript\">" + js + "</script>"
 }
 
 exports.aUploadUtil = async function(file, subDir) {
