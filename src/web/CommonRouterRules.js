@@ -126,6 +126,8 @@ exports.addCommonRouteRules = function(RouteRuleRegisters) {
         UploadHandler.aUploadForRichText)
     rrr.post("/ckeditor-file", {action: "RichTextUpload"},
         UploadHandler.aUploadForCkEditor)
+    rrr.post("/ckeditor-image", {action: "RichTextUpload"},
+        UploadHandler.aUploadImageForCkEditor)
 
     // ======================================
     // 搜索引擎

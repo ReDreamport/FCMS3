@@ -82,9 +82,23 @@ exports.aUploadForCkEditor = async function(ctx) {
 
     let result = await exports.aUploadUtil(file, "RichText")
     let filePath = Config.fileDownloadPrefix + result.fileRelativePath
+
     let js = `window.parent.CKEDITOR.tools.callFunction("${CKEditorFuncNum}", "${filePath}", "");`
     ctx.body = "<script type=\"text/javascript\">" + js + "</script>"
 }
+
+exports.aUploadImageForCkEditor = async function(ctx) {
+    let files = ctx.request.body.files
+    if (!files) return ctx.status = 400
+    let file = Util.firstValueOfObject(files)
+    if (!file) return ctx.status = 400
+
+    let result = await exports.aUploadUtil(file, "RichText")
+    let filePath = Config.fileDownloadPrefix + result.fileRelativePath
+
+    ctx.body = {uploaded: 1, fileName: file.path, url: filePath}
+}
+
 
 exports.aUploadUtil = async function(file, subDir) {
     let fileTargetDir = path.join(Config.fileDir, subDir)
