@@ -289,8 +289,9 @@ exports.firstValueOfObject = function(object) {
 // 确保返回 origin 带端口，即使是 80 端口
 exports.getUrlOriginWithPort = function(urlObject) {
     let origin = urlObject.origin
-    if (!origin.match(new RegExp(`:${urlObject.port}$`))) {
-        origin = origin + `:${urlObject.port}`
+    let port = urlObject.port || 80
+    if (!origin.match(new RegExp(`:${port}$`))) {
+        origin = origin + `:${port}`
     }
     return origin
 }
