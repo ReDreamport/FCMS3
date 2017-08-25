@@ -3,6 +3,7 @@ const {URL} = require("url")
 
 const Meta = require("../Meta")
 const Log = require("../Log")
+const Util = require("../Util")
 const Config = require("../Config")
 const Errors = require("../Errors")
 const EntityService = require("../service/EntityService")
@@ -28,7 +29,7 @@ exports.aAuth = async function(ctx) {
     }
 
     let callbackUrl = new URL(callback)
-    let callbackOrigin = callbackUrl.origin // http://www.baidu.com:80
+    let callbackOrigin = Util.getUrlOriginWithPort(callbackUrl) // http://www.baidu.com:80
     let clientConfig = Config.ssoServer.clients[callbackOrigin]
     if (!clientConfig)
         throw new Errors.UserError("UnkownClient",
