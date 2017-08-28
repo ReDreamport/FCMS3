@@ -274,6 +274,10 @@ exports.hashPassword = function(password) {
     return crypto.createHash("md5").update(password + password).digest("hex")
 }
 
+exports.checkPasswordEquals = function(target, notSalted) {
+    return exports.hashPassword(notSalted) === target
+}
+
 exports.getCollectionName = function(entityMeta, repo) {
     if (repo === "trash")
         return entityMeta.tableName + "_trash"

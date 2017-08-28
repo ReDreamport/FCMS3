@@ -158,7 +158,7 @@ async function aSignIn(username, password) {
 
     if (!user) throw new Errors.UserError("UserNotExisted")
     if (user.disabled) throw new Errors.UserError("UserDisabled")
-    if (Meta.hashPassword(password) !== user.password)
+    if (!Meta.checkPasswordEquals(user.password, password))
         throw new Errors.UserError("PasswordNotMatch")
 
     let session = {}

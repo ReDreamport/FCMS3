@@ -145,7 +145,7 @@ exports.aSignIn = async function(origin, username, password) {
 
     if (!user) throw new Errors.UserError("UserNotExisted")
     if (user.disabled) throw new Errors.UserError("UserDisabled")
-    if (Meta.hashPassword(password) !== user.password)
+    if (!Meta.checkPasswordEquals(user.password, password))
         throw new Errors.UserError("PasswordNotMatch")
 
     let session = await exports.aSignInSuccessfully(origin, user)
@@ -212,7 +212,7 @@ exports.aChangePassword = async function(userId, oldPassword, newPassword) {
         "F_User", {_id: userId})
     if (!user) throw new Errors.UserError("UserNotExisted")
     if (user.disabled) throw new Errors.UserError("UserDisabled")
-    if (Meta.hashPassword(oldPassword) !== user.password)
+    if (!Meta.checkPasswordEquals(user.password, oldPassword))
         throw new Errors.UserError("PasswordNotMatch")
 
     let update = {password: Meta.hashPassword(newPassword)}
