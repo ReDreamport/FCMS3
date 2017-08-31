@@ -56,6 +56,17 @@ class RouteRuleRegisters {
     del(url, info, ...handlers) {
         this.add("delete", url, info, ...handlers)
     }
+
+    listGetCreateUpadte(urlPrefix, info, handlers, ...middlewares) {
+        if (handlers[0])
+            this.add("get", urlPrefix, info, ...middlewares, handlers[0])
+        if (handlers[1])
+            this.add("get", `${urlPrefix}/:id`, info, ...middlewares, handlers[1])
+        if (handlers[2])
+            this.add("post", urlPrefix, info, ...middlewares, handlers[2])
+        if (handlers[3])
+            this.add("put", `${urlPrefix}/:id`, info, ...middlewares, handlers[3])
+    }
 }
 
 exports.RouteRuleRegisters = RouteRuleRegisters
