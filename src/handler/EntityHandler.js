@@ -345,7 +345,7 @@ exports.parseListQuery = function(entityMeta, query) {
             sort = null
         }
     } else {
-        let sortBy = query._sortBy || "_createdOn"
+        let sortBy = query._sortBy || "_modifiedOn"
         let sortOrder = query._sortOrder === "asc" ? 1 : -1
         sort = {[sortBy]: sortOrder}
     }
