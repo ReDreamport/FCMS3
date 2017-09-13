@@ -143,8 +143,13 @@ exports.aFindOneByCriteria = async function(conn, entityName, criteria,
     options) {
     let entityMeta = Meta.getEntityMeta(entityName)
 
-    options = options || {}
-    let includedFields = options.includedFields || []
+    let includedFields
+    if (_.isArray(options)) {
+        includedFields = options
+    } else {
+        options = options || {}
+        includedFields = options.includedFields || []
+    }
 
     let cacheId = "OneByCriteria|" + options.repo + "|" + JSON.stringify(
         criteria) + "|" + includedFields.join(",")
@@ -199,8 +204,11 @@ exports.aList = async function(conn, entityName, options) {
 }
 
 exports.aFindManyByCriteria = async function(conn, entityName, options) {
-    "use strict"
-    options = options || {}
+    if (_.isArray(options)) {
+        options = {includedFields: options}
+    } else {
+        options = options || {}
+    }
     options.pageSize = options.pageSize || -1
     options.withoutTotal = true
 
@@ -208,12 +216,15 @@ exports.aFindManyByCriteria = async function(conn, entityName, options) {
 }
 
 exports.aFindManyByIds = async function(conn, entityName, ids, options) {
-    options = options || {}
+    if (_.isArray(options)) {
+        options = {includedFields: options}
+    } else {
+        options = options || {}
+    }
+
     options.criteria = {
         __type: "relation",
-        field: "_id",
-        operator: "in",
-        value: ids
+        field: "_id", operator: "in", value: ids
     }
     options.pageSize = -1
     options.withoutTotal = true

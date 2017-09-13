@@ -1,6 +1,6 @@
 {
     "name": "fcms",
-    "version": "3.0.1",
+    "version": "3.1.1",
     "description": "FAST Content Management System",
     "dependencies": {
         "bluebird": "^3.5.0",

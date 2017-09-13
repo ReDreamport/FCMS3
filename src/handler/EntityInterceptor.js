@@ -8,22 +8,22 @@ exports.Actions = {
     List: "List"
 }
 
-async function defaultAsyncInterceptor(...args) {
-    return args[args.length - 1]()
+async function defaultInterceptor() {
+    let aFunc = arguments[arguments.length - 1]
+    return aFunc()
 }
 
-const asyncInterceptors = {}
+const interceptors = {}
 
 exports.setInterceptor = function(entityName, actions, asyncInterceptor) {
     if (!_.isArray(actions)) actions = [actions]
 
-    asyncInterceptors[entityName] = asyncInterceptors[entityName] || {}
+    interceptors[entityName] = interceptors[entityName] || {}
     for (let action of actions)
-        asyncInterceptors[entityName][action] = asyncInterceptor
+        interceptors[entityName][action] = asyncInterceptor
 }
 
 exports.getInterceptor = function(entityName, action) {
-    let asyncInterceptorOfEntity = asyncInterceptors[entityName]
-    return asyncInterceptorOfEntity && asyncInterceptorOfEntity[action] ||
-        defaultAsyncInterceptor
+    let icts = interceptors[entityName]
+    return icts && icts[action] || defaultInterceptor
 }

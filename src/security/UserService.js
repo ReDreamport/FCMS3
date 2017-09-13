@@ -188,21 +188,21 @@ exports.aAddUser = async function(userInput) {
 
 // 修改绑定的手机
 // exports.gChangePhone = (userId, phone)->
-//     user = await EntityService.gFindOneByCriteria({}, 'F_User', {_id: userId})
+//     user = await Service.gFindOneByCriteria({}, 'F_User', {_id: userId})
 //     throw new error.UserError("UserNotExisted") unless user?
 //     throw new error.UserError("UserDisabled") if user.disabled
 //
-//     await EntityService.gUpdateOneByCriteria({}, 'F_User', {_id: userId, _version: user._version}, {phone: phone})
+//     await Service.gUpdateOneByCriteria({}, 'F_User', {_id: userId, _version: user._version}, {phone: phone})
 //
 //     await Cache.gUnset [cacheKeyRoot, 'user'], [userId]
 //
 // 修改绑定的邮箱
 // exports.gChangeEmail = (userId, email)->
-//     user = await EntityService.gFindOneByCriteria({}, 'F_User', {_id: userId})
+//     user = await Service.gFindOneByCriteria({}, 'F_User', {_id: userId})
 //     throw new error.UserError("UserNotExisted") unless user?
 //     throw new error.UserError("UserDisabled") if user.disabled
 //
-//     await EntityService.gUpdateOneByCriteria({}, 'F_User', {_id: userId, _version: user._version}, {email: email})
+//     await Service.gUpdateOneByCriteria({}, 'F_User', {_id: userId, _version: user._version}, {email: email})
 //
 //     await Cache.gUnset [cacheKeyRoot, 'user'], [userId]
 //
@@ -224,23 +224,23 @@ exports.aChangePassword = async function(userId, oldPassword, newPassword) {
 //
 // 通过手机重置密码
 // exports.gResetPasswordByPhone = (phone, password)->
-//     user = await EntityService.gFindOneByCriteria({}, 'F_User', {phone: phone})
+//     user = await Service.gFindOneByCriteria({}, 'F_User', {phone: phone})
 //     throw new error.UserError("UserNotExisted") unless user?
 //     throw new error.UserError("UserDisabled") if user.disabled
 //
 //     update = {password: Meta.hashPassword(password)}
-//     await EntityService.gUpdateOneByCriteria({}, 'F_User', {_id: user._id, _version: user._version}, update)
+//     await Service.gUpdateOneByCriteria({}, 'F_User', {_id: user._id, _version: user._version}, update)
 //
 //     await _gRemoveAllUserSessionOfUser user._id
 //
 // # 通过邮箱重置密码
 // exports.gResetPasswordByEmail = (email, password)->
-//     user = await EntityService.gFindOneByCriteria({}, 'F_User', {email: email})
+//     user = await Service.gFindOneByCriteria({}, 'F_User', {email: email})
 //     throw new error.UserError("UserNotExisted") unless user?
 //     throw new error.UserError("UserDisabled") if user.disabled
 //
 //     update = {password: Meta.hashPassword(password)}
-//     await EntityService.gUpdateOneByCriteria({}, 'F_User', {_id: user._id, _version: user._version}, update)
+//     await Service.gUpdateOneByCriteria({}, 'F_User', {_id: user._id, _version: user._version}, update)
 //
 //     await _gRemoveAllUserSessionOfUser user._id
 //
