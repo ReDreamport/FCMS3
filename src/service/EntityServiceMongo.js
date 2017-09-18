@@ -47,7 +47,8 @@ exports.aUpdateManyByCriteria = async function(entityMeta, criteria,
     }
 }
 
-exports.aUpdateOneByCriteria = async function(entityMeta, criteria, instance) {
+exports.aUpdateOneByCriteria = async function(entityMeta, criteria, instance,
+    options) {
     let update = objectToMongoUpdate(instance)
     if (!update) return 0
 
@@ -58,7 +59,7 @@ exports.aUpdateOneByCriteria = async function(entityMeta, criteria, instance) {
 
     let r
     try {
-        let res = await c.updateOne(nativeCriteria, update)
+        let res = await c.updateOne(nativeCriteria, update, options)
         r = Mongo.getUpdateResult(res)
     } catch (e) {
         if (!Mongo.isIndexConflictError(e)) throw e
@@ -66,7 +67,7 @@ exports.aUpdateOneByCriteria = async function(entityMeta, criteria, instance) {
         throw new Errors.UniqueConflictError(code, message)
     }
 
-    if (r.modifiedCount !== 1) throw new Errors.UserError("ConcurrentUpdate")
+    // if (r.modifiedCount !== 1) throw new Errors.UserError("ConcurrentUpdate")
 }
 
 exports.aRemoveManyByCriteria = async function(entityMeta, criteria) {

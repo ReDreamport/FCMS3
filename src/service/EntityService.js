@@ -35,7 +35,7 @@ exports.aCreate = async function(conn, entityName, instance) {
     }
 }
 exports.aUpdateOneByCriteria = async function(conn, entityName, criteria,
-    instance) {
+    instance, options) {
     "use strict"
     delete instance._id
     delete instance._version
@@ -51,10 +51,10 @@ exports.aUpdateOneByCriteria = async function(conn, entityName, criteria,
     try {
         if (entityMeta.db === Meta.DB.mysql)
             return MysqlService.aUpdateOneByCriteria(conn, entityMeta,
-                criteria, instance)
+                criteria, instance, options)
         else if (entityMeta.db === Meta.DB.mongo)
             return MongoService.aUpdateOneByCriteria(entityMeta,
-                criteria, instance)
+                criteria, instance, options)
     } finally {
         // TODO 清除效率改进
         await EntityCache.aFireEntityUpdated(conn, entityMeta, null)
