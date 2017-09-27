@@ -57,7 +57,7 @@ class RouteRuleRegisters {
         this.add("delete", url, info, ...handlers)
     }
 
-    listGetCreateUpadte(urlPrefix, info, handlers, ...middlewares) {
+    listGetCreateUpdate(urlPrefix, info, handlers, ...middlewares) {
         if (handlers[0])
             this.add("get", urlPrefix, info, ...middlewares, handlers[0])
         if (handlers[1])
