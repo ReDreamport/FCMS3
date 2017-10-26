@@ -11,7 +11,7 @@ exports.aSendSignUpCodeToPhone = async function(ctx) {
 
     const phone = ctx.params.phone
     if (!phone) return ctx.status = 400
-    await SecurityCodeService.gSendSecurityCodeToPhone(phone)
+    await SecurityCodeService.aSendSecurityCodeToPhone(phone)
 
     ctx.status = 204
 }
@@ -23,7 +23,7 @@ exports.aSendSignUpCodeToEmail = async function(ctx) {
     const email = ctx.params.email
     if (!email) return ctx.status = 400
 
-    await SecurityCodeService.gSendSecurityCodeToEmail(email)
+    await SecurityCodeService.aSendSecurityCodeToEmail(email)
     ctx.status = 204
 }
 

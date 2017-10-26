@@ -21,7 +21,7 @@ exports.aGenerate = async function(ctx) {
 exports.aCheck = async function(id, text) {
     if (!(id && text)) return false
     const expected = await Cache.aGetString(["captcha", id])
-    return expected === text
+    return expected && text && expected.toLowerCase() === text.toLowerCase()
 }
 
 exports.aClearById = async function(id) {
