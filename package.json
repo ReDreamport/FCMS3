@@ -24,5 +24,8 @@
   },
   "devDependencies": {
     "gulp-typescript": "^3.2.2"
+  },
+  "optionalDependencies": {
+    "simple-captcha": "^0.1.10"
   }
 }
