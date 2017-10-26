@@ -99,7 +99,6 @@ exports.aUploadImageForCkEditor = async function(ctx) {
     ctx.body = {uploaded: 1, fileName: file.path, url: filePath}
 }
 
-
 exports.aUploadUtil = async function(file, subDir) {
     let fileTargetDir = path.join(Config.fileDir, subDir)
 

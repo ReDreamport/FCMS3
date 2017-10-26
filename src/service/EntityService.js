@@ -184,6 +184,15 @@ exports.aList = async function(conn, entityName, options) {
         `List|${repo}|${pageNo}|${pageSize}|${criteriaString}|` +
         `${sortString}|${includedFieldsString}`
 
+    // 不对，应该使用类似于 notInListInterface 之类的字段
+    // if (!includedFields || includedFields.length === 0) {
+    //     includedFields = []
+    //     for (let fn in entityMeta.fields) {
+    //         let fm = entityMeta.fields[fn]
+    //         if (!fm.hideInListPage) includedFields.push(fn)
+    //     }
+    // }
+
     return EntityCache.aWithCache(entityMeta, ["Other", cacheId],
         async() => {
             let query = {

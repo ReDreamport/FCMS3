@@ -1,3 +1,5 @@
+// cSpell:words Captcha
+
 const Meta = require("../Meta")
 const Config = require("../Config.js")
 
@@ -68,17 +70,17 @@ exports.addCommonRouteRules = function(RouteRuleRegisters) {
     // ======================================
     // 安全
     // ======================================
-    // let SecurityCodeHandler = require('../handler/SecurityCodeHandler')
+    let SecurityCodeHandler = require("../handler/SecurityCodeHandler")
 
     // 发送注册验证码到手机和邮箱
-    // rrr.post('/security-code/phone/:phone', {},
-    //     SecurityCodeHandler.aSendSignUpCodeToPhone)
-    // rrr.post('/security-code/email/:email', {},
-    //     SecurityCodeHandler.aSendSignUpCodeToEmail)
+    rrr.post("/security-code/phone/:phone", {},
+        SecurityCodeHandler.aSendSignUpCodeToPhone)
+    rrr.post("/security-code/email/:email", {},
+        SecurityCodeHandler.aSendSignUpCodeToEmail)
 
-    // let CaptchaHandler = require('../handler/CaptchaHandler')
+    let CaptchaHandler = require("../handler/CaptchaHandler")
     // 请求一个图形验证码
-    // rrr.get('/captcha', {}, CaptchaHandler.aGenerate)
+    rrr.get("/captcha", {}, CaptchaHandler.aGenerate)
 
     // ======================================
     // 实体 CRUD
