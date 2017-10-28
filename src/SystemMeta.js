@@ -900,9 +900,16 @@ const SystemEntities = {
                 inputType: "Text",
                 persistType: "String"
             },
-            entityName: {
+            token: {
                 name: "token",
                 label: "授权令牌",
+                type: "String",
+                inputType: "Text",
+                persistType: "String"
+            },
+            userId: {
+                name: "userId",
+                label: "UserId",
                 type: "String",
                 inputType: "Text",
                 persistType: "String"

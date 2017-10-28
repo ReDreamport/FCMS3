@@ -32,8 +32,8 @@ exports.aAuth = async function(ctx) {
     let callbackOrigin = Util.getUrlOriginWithPort(callbackUrl) // http://www.baidu.com:80
     let clientConfig = Config.ssoServer.clients[callbackOrigin]
     if (!clientConfig)
-        throw new Errors.UserError("UnkownClient",
-            "Unkown Client: " + callbackOrigin)
+        throw new Errors.UserError("UnknownClient",
+            "Unknown Client: " + callbackOrigin)
 
     let {acceptTokenUrl} = clientConfig
 
@@ -66,16 +66,18 @@ exports.aValidateToken = async function(ctx) {
 
     let clientConfig = Config.ssoServer.clients[req.origin]
     if (!clientConfig)
-        throw new Errors.UserError("UnkownClient",
-            "Unkown Client: " + req.origin)
+        throw new Errors.UserError("UnknownClient",
+            "Unknown Client: " + req.origin)
     // 校验客户端的通信密钥
     if (clientConfig.key !== req.key)
         throw new Errors.UserError("BadClientKey", "Bad Client Key")
 
     let ct = await EntityService.aFindOneByCriteria({},
         "F_SsoClientToken", {origin: req.origin, token: req.token})
-    if (!ct) throw new Errors.UserError("BadToken", "Bad Token")
-
+    if (!ct) {
+        Log.debug(`Bad Token: ${req.token}/${req.origin}`)
+        throw new Errors.UserError("BadToken", "Bad Token")
+    }
     // 只能用一次，检验后就删除
     await EntityService.aRemoveManyByCriteria({}, "F_SsoClientToken",
         {_id: ct._id})
@@ -110,7 +112,7 @@ exports.aSignOut = async function(ctx) {
         {userId: userId})
 
     let redirect = ctx.request.origin +
-            `/sso/sign-in?callback=${encodedCallback}`
+        `/sso/sign-in?callback=${encodedCallback}`
     ctx.redirect(redirect)
 }
 

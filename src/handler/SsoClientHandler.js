@@ -43,7 +43,7 @@ exports.aAcceptToken = async function(ctx) {
 
         ctx.redirect(callback)
     } catch (e) {
-        Log.system.error(e, "Failed to validate SSO token")
+        // console.log("error", e)
         throw e
     }
 }
