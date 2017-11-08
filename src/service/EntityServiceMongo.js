@@ -172,12 +172,15 @@ exports.aList = async function(options) {
 }
 
 function errorToDupKeyError(e, entityMeta) {
-    // Log.debug('toDupKeyError, message', e.message)
+    // Log.debug("toDupKeyError, message", e.message)
     // E11000 duplicate key error index: fcms.F_User.$F_User_nickname dup key: { : "yyyy" }
-    let matches = e.message.match(/index:\s(.+)\$(.+) dup key: (.+)/)
+    let matches = e.message.match(/index:\s(.+) dup key: (.+)/)
     if (matches) {
-        let indexName = matches[2]
-        // let value = matches[3]
+        let indexName = matches[1]
+        let dollarIndex = indexName.indexOf("$")
+        if (dollarIndex >= 0) {
+            indexName = indexName.substring(dollarIndex + 1)
+        }
         Log.debug("toDupKeyError, indexName=" + indexName)
 
         let indexConfig = _.find(entityMeta.mongoIndexes, i =>
