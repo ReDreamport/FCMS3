@@ -119,7 +119,7 @@ exports.listToMap = function(list, keyField) {
 }
 
 exports.objectIdsEquals = function(a, b) {
-    return _.isNull(a) && _.isNull(b) || a.toString() === b.toString()
+    return _.isNull(a) && _.isNull(b) || a && b && a.toString() === b.toString()
 }
 
 exports.inObjectIds = function(targetId, ids) {
